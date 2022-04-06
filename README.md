@@ -16,10 +16,6 @@ And then execute:
 
     $ bundle install
 
-Or install it yourself as:
-
-    $ gem install switch_connection_manager
-
 ## Usage
 
 TODO: Write usage instructions here
@@ -31,3 +27,6 @@ The gem is available as open source under the terms of the [MIT License](https:/
 ## TODO:
 * procon_simulatorを起動するとバッテリーが動きまくるのを直す
 * PBMとプロコンをbluetoothで接続する
+* usb gadgetをresetしてからすぐにavailableになる時と、数秒開けないとavailableにならない時がある.
+  * readとかすれば状態を認知できて適切なインターバルがわかるかも
+  * resetしてからインターバルが長すぎると接続できない？
