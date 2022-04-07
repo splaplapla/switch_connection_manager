@@ -27,7 +27,7 @@ class SwitchConnectionManager::ProconSimulator
     case first_data_part
     when "00", "80"
       data = raw_data.unpack("H*").first
-      puts(">>> #{data}")
+      to_stdout(">>> #{data}")
       case data
       when "0000", "8005"
         return nil
@@ -133,7 +133,7 @@ class SwitchConnectionManager::ProconSimulator
   end
 
   def write(data)
-    puts("<<< #{data}")
+    to_stdout("<<< #{data}")
     @gadget.write_nonblock([data].pack("H*"))
   rescue IO::EAGAINWaitReadable
     retry
@@ -167,6 +167,10 @@ class SwitchConnectionManager::ProconSimulator
     @gadget = File.open('/dev/hidg0', "w+b")
 
     SwitchConnectionManager::UsbDeviceController.reset
+  end
+
+  def to_stdout(text)
+    puts(text)
   end
 end
 

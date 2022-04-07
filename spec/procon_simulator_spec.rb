@@ -19,7 +19,8 @@ describe SwitchConnectionManager::ProconSimulator do
     describe 'unit test' do
       before do
         allow(simulator).to receive(:write)
-        allow(simulator).to receive(:read).and_return([received_data].pack("H*"))
+        allow(simulator).to receive(:to_stdout)
+        allow(simulator).to receive(:read).and_return([subject_data].pack("H*"))
       end
 
       subject { simulator.read_once }
@@ -29,18 +30,44 @@ describe SwitchConnectionManager::ProconSimulator do
       end
 
       context '>>> 0000' do
-        let(:received_data) { "0000" }
+        let(:subject_data) { "0000" }
         it { expect(subject).to be_nil }
       end
 
       context '>>> 8005' do
-        let(:received_data) { "8005" }
+        let(:subject_data) { "8005" }
         it { expect(subject).to be_nil }
       end
 
       context '>>> 8001' do
-        let(:received_data) { "8001" }
+        let(:subject_data) { "8001" }
         it { expect(subject).to match("8101000300005e00535e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000") }
+        include_examples "it_is_64bytes"
+      end
+
+      context '>>> 8002' do
+        let(:subject_data) { "8002" }
+        it { expect(subject).to match("81020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000") }
+        include_examples "it_is_64bytes"
+      end
+
+      context '>>> 10-03' do
+        let(:subject_data) { "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000" }
+        it { expect(subject).to match((/^21.#{initial_input}8003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/)) }
+        include_examples "it_is_64bytes"
+      end
+
+      context '>>> 8004' do
+        let(:subject_data) { "8004" }
+        it do
+          expect(simulator).to receive(:start_procon_simulator_thread).once
+          expect(subject).to be_nil
+        end
+      end
+
+      context '>>> 01-48' do
+        let(:subject_data) { "01000000000000000000480000000000000000000000000000000000000000000000000000000000000000000000000000" }
+        it { expect(subject).to match((/^21.#{initial_input}804800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/)) }
         include_examples "it_is_64bytes"
       end
     end
