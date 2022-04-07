@@ -15,24 +15,39 @@ describe SwitchConnectionManager::ProconSimulator do
     end
   end
 
-  describe 'unit test' do
-    context '>>> 8001' do
+  describe '#read_once' do
+    describe 'unit test' do
       before do
         allow(simulator).to receive(:write)
-        allow(simulator).to receive(:read).and_return(
-          ["8001"].pack("H*"), # <<< 810100031f861dd6030400000000000000000000000000000 # procon
-        )
+        allow(simulator).to receive(:read).and_return([received_data].pack("H*"))
       end
 
-      it do
-        expect(simulator.read_once).to match("8101000300005e00535e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+      subject { simulator.read_once }
+
+      shared_examples 'it_is_64bytes' do
+        it { expect([subject].pack("H*").size).to eq(64) }
+      end
+
+      context '>>> 0000' do
+        let(:received_data) { "0000" }
+        it { expect(subject).to be_nil }
+      end
+
+      context '>>> 8005' do
+        let(:received_data) { "8005" }
+        it { expect(subject).to be_nil }
+      end
+
+      context '>>> 8001' do
+        let(:received_data) { "8001" }
+        it { expect(subject).to match("8101000300005e00535e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000") }
+        include_examples "it_is_64bytes"
       end
     end
 
     context '順番に呼び出すとき' do
       before do
         allow(simulator).to receive(:write)
-
         allow(simulator).to receive(:read).and_return(
           ["0000"].pack("H*"), # none
           ["0000"].pack("H*"), # none
@@ -65,10 +80,10 @@ describe SwitchConnectionManager::ProconSimulator do
 
       it do
         expect(simulator).to receive(:start_procon_simulator_thread).once
-        expect(simulator.read_once).to eq("0000")
-        expect(simulator.read_once).to eq("0000")
-        expect(simulator.read_once).to eq("8005")
-        expect(simulator.read_once).to eq("0000")
+        expect(simulator.read_once).to eq(nil) # 0000
+        expect(simulator.read_once).to eq(nil) # 0000
+        expect(simulator.read_once).to eq(nil) # 8005
+        expect(simulator.read_once).to eq(nil) # 0000
         expect(simulator.read_once).to match("8101000300005e00535e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
         expect(simulator.read_once).to match("81020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
         expect(simulator.read_once).to match(/^21.#{initial_input}8003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-03

@@ -30,7 +30,7 @@ class SwitchConnectionManager::ProconSimulator
       puts(">>> #{data}")
       case data
       when "0000", "8005"
-        return data # do not need response
+        return nil
       when "8001"
         response(
           make_response("81", "01", "0003#{MAC_ADDR}")
