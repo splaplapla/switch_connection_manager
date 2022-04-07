@@ -124,12 +124,12 @@ class SwitchConnectionManager::ProconSimulator
   end
 
   def response_counter
+    @response_counter = @response_counter + 1
     if @response_counter >= 256
-      @response_counter = 0
+      @response_counter = "0"
     else
-      @response_counter = @response_counter + 1
+      @response_counter.to_s
     end
-    @response_counter.to_s.rjust(2, "0")
   end
 
   def write(data)

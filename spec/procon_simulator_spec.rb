@@ -6,13 +6,12 @@ describe SwitchConnectionManager::ProconSimulator do
   let(:simulator) { described_class.new }
 
   describe '#response_counter' do
-    it '256の次は0になること' do
-      255.times do
+    it '255の次は0になること' do
+      254.times do
         simulator.send(:response_counter)
       end
-
-      expect(simulator.send(:response_counter)).to eq("256")
-      expect(simulator.send(:response_counter)).to eq("00")
+      expect(simulator.send(:response_counter)).to eq("255")
+      expect(simulator.send(:response_counter)).to eq("0")
     end
   end
 
@@ -72,26 +71,26 @@ describe SwitchConnectionManager::ProconSimulator do
         expect(simulator.read_once).to eq("0000")
         expect(simulator.read_once).to match("8101000300005e00535e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
         expect(simulator.read_once).to match("81020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
-        expect(simulator.read_once).to match(/^21..#{initial_input}800300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-03
-          expect(simulator.read_once).to match(nil)
-        expect(simulator.read_once).to match(/^21..#{initial_input}804800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-48
-          expect(simulator.read_once).to match(/^21..#{initial_input}820203480302#{procon_mac_addr.reverse}030100000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-02
-          expect(simulator.read_once).to match(/^21..#{initial_input}800800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-08
-          expect(simulator.read_once).to match(/^21..#{initial_input}90100060000010ffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000/) # 01-10-0060, Serial number
-          expect(simulator.read_once).to match(/^21..#{initial_input}90105060000010bc114275a928ffffffffffffff00000000000000000000000000000000000000000000000000000000000000/) # Controller Color
-          expect(simulator.read_once).to match(/^21..#{initial_input}810103000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-01, Bluetooth manual pairing
-          expect(simulator.read_once).to match(/^21..#{initial_input}83040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-04, Trigger buttons elapsed time
-          expect(simulator.read_once).to match(/^21..#{initial_input}9010806000001050fd0000c60f0f30619630f3d41454411554c7799c333663000000000000000000000000000000000000000/) # 01-10-8060, Factory Sensor and Stick device parameters
-          expect(simulator.read_once).to match(/^21..#{initial_input}901098600000100f30619630f3d41454411554c7799c333663000000000000000000000000000000000000000000000000000/) # 01-10-9860, Factory Stick device parameters 2
-          expect(simulator.read_once).to match(/^21..#{initial_input}90101080000010ffffffffffffffffffffffffffffffffffffffffffffb2a1000000000000000000000000000000000000000/) # 01-10-1080, User Analog sticks calibration
-          expect(simulator.read_once).to be_nil # unkown
-        expect(simulator.read_once).to match(/^21..#{initial_input}90103d60000010ba156211b87f29065bffe77e0e36569e8560ff323232ffffff0000000000000000000000000000000000000/) # 01-10-3d60, Factory configuration & calibration 2
-          expect(simulator.read_once).to match(/^21..#{initial_input}90102880000010beff3e00f001004000400040fefffeff0800e73be73be73b000000000000000000000000000000000000000/) # 01-10-2880, User 6-Axis Motion Sensor calibration
-          expect(simulator.read_once).to match(/^21..#{initial_input}80400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
-          expect(simulator.read_once).to be_nil # unkown
-        expect(simulator.read_once).to match(/^21..#{initial_input}80480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
-          expect(simulator.read_once).to match(/^21..#{initial_input}80480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
-          expect(simulator.read_once).to match(/^21..#{initial_input}80300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
+        expect(simulator.read_once).to match(/^21.#{initial_input}8003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-03
+        expect(simulator.read_once).to match(nil)
+        expect(simulator.read_once).to match(/^21.#{initial_input}804800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-48
+        expect(simulator.read_once).to match(/^21.#{initial_input}820203480302#{procon_mac_addr.reverse}0301000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-02
+        expect(simulator.read_once).to match(/^21.#{initial_input}8008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-08
+        expect(simulator.read_once).to match(/^21.#{initial_input}90100060000010ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000/) # 01-10-0060, Serial number
+        expect(simulator.read_once).to match(/^21.#{initial_input}90105060000010bc114275a928ffffffffffffff000000000000000000000000000000000000000000000000000000000000000/) # Controller Color
+        expect(simulator.read_once).to match(/^21.#{initial_input}8101030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-01, Bluetooth manual pairing
+        expect(simulator.read_once).to match(/^21.#{initial_input}830400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-04, Trigger buttons elapsed time
+        expect(simulator.read_once).to match(/^21.#{initial_input}9010806000001050fd0000c60f0f30619630f3d41454411554c7799c3336630000000000000000000000000000000000000000/) # 01-10-8060, Factory Sensor and Stick device parameters
+        expect(simulator.read_once).to match(/^21..?#{initial_input}901098600000100f30619630f3d41454411554c7799c3336630000000000000000000000000000000000000000000000000000/) # 01-10-9860, Factory Stick device parameters 2
+        expect(simulator.read_once).to match(/^21..?#{initial_input}90101080000010ffffffffffffffffffffffffffffffffffffffffffffb2a10000000000000000000000000000000000000000/) # 01-10-1080, User Analog sticks calibration
+        expect(simulator.read_once).to be_nil # unkown
+        expect(simulator.read_once).to match(/^21..?#{initial_input}90103d60000010ba156211b87f29065bffe77e0e36569e8560ff323232ffffff00000000000000000000000000000000000000/) # 01-10-3d60, Factory configuration & calibration 2
+        expect(simulator.read_once).to match(/^21..?#{initial_input}90102880000010beff3e00f001004000400040fefffeff0800e73be73be73b0000000000000000000000000000000000000000/) # 01-10-2880, User 6-Axis Motion Sensor calibration
+        expect(simulator.read_once).to match(/^21..?#{initial_input}804000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
+        expect(simulator.read_once).to be_nil # unkown
+        expect(simulator.read_once).to match(/^21..?#{initial_input}804800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
+        expect(simulator.read_once).to match(/^21..?#{initial_input}804800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
+        expect(simulator.read_once).to match(/^21..?#{initial_input}803000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000/) # 01-40
       end
     end
   end
