@@ -37,7 +37,6 @@ class SwitchConnectionManager::SwitchSimulatorForProcon
     end
 
     raw_data = read
-    to_stdout("<<< #{raw_data.unpack("H*").first}")
 
     case first_data_part = raw_data[0..1].unpack("H*").first
     when "8101"
@@ -68,7 +67,9 @@ class SwitchConnectionManager::SwitchSimulatorForProcon
   private
 
   def read
-    procon.read_nonblock(64)
+    raw_data = procon.read_nonblock(64)
+    to_stdout("<<< #{raw_data.unpack("H*").first}")
+    return raw_data
   rescue IO::EAGAINWaitReadable
     retry
   end
