@@ -1,12 +1,9 @@
 # 対プロコンに対して使う用です
 class SwitchConnectionManager::SwitchSimulatorForProcon
   class AlreadyConnectedError < StandardError; end
-
-  STEPS = [
-    :disconnected,
-    :sent_initialize_data,
-    :connected
-  ]
+  # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
+  # TODO 切断したらstatusをdisconnectedにする
+  # TODO switchと接続していない状態でもジャイロを動くようにする
 
   attr_accessor :procon
 
