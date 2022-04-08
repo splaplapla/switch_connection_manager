@@ -20,6 +20,30 @@ And then execute:
 
 TODO: Write usage instructions here
 
+
+## 接続プロトコル(プロコンがデータを送信するようになるまで)
+
+```mermaid
+sequenceDiagram
+  autonumber
+
+  Switch ->>+Procon: 0000
+  Switch ->>+Procon: 0000
+  Switch ->>+Procon: 8005
+  Switch ->>+Procon: 0000
+  Switch ->>+Procon: 8001
+  Procon ->>+Switch: 810100031f861dd6030400000000000000000000000000000...
+  Switch ->>+Procon: 8002
+  Procon ->>+Switch: 8102000000000000000000000000000000000000000000000...
+  Switch ->>+Procon: 0100000000000000000003300000000000000000000000000...
+  Procon ->>+Switch: 21...
+  Switch ->>+Procon: 8004
+  loop
+    Procon ->> Switch: 30...
+  end
+```
+
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
