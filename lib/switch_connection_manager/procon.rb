@@ -1,5 +1,5 @@
 # 対プロコンに対して使う用です
-class SwitchConnectionManager::SwitchSimulatorForProcon
+class SwitchConnectionManager::Procon
   class AlreadyConnectedError < StandardError; end
   # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
   # TODO 切断したらstatusをdisconnectedにする

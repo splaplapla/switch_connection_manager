@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe SwitchConnectionManager::SwitchSimulatorForProcon do
+describe SwitchConnectionManager::Procon do
   let(:simulator) { described_class.new }
   let(:initial_input) { SwitchConnectionManager::ProconSimulator::UART_INITIAL_INPUT }
 
@@ -21,7 +21,7 @@ describe SwitchConnectionManager::SwitchSimulatorForProcon do
       expect(simulator.do_once).to eq("8002")
       expect(simulator.do_once).to eq("01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000")
       expect(simulator.do_once).to eq("8004")
-      expect { simulator.do_once }.to raise_error(SwitchConnectionManager::SwitchSimulatorForProcon::AlreadyConnectedError)
+      expect { simulator.do_once }.to raise_error(SwitchConnectionManager::Procon::AlreadyConnectedError)
     end
   end
 end
