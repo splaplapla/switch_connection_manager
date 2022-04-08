@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require_relative "switch_connection_manager/version"
+require_relative "switch_connection_manager/procon_finder"
 require_relative "switch_connection_manager/procon_simulator"
-require_relative "switch_connection_manager/usb_device_controller"
+require_relative "switch_connection_manager/switch_simulator_for_procon"
 
 module SwitchConnectionManager
   class Error < StandardError; end

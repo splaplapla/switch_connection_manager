@@ -1,5 +1,6 @@
 class SwitchConnectionManager::ProconSimulator
   attr_accessor :gadget, :procon
+
   MAC_ADDR = '00005e00535e'
 
   UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
@@ -157,13 +158,6 @@ class SwitchConnectionManager::ProconSimulator
 
   def init_devices
     SwitchConnectionManager::UsbDeviceController.init
-
-    if path = SwitchConnectionManager::DeviceProconFinder.find
-      @procon = File.open(path, "w+b")
-      puts "proconのデバイスファイルは#{path}を使います"
-    else
-      raise "not found procon error" # TODO erro class
-    end
     @gadget = File.open('/dev/hidg0', "w+b")
 
     SwitchConnectionManager::UsbDeviceController.reset
