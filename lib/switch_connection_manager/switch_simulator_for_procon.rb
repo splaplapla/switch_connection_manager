@@ -82,7 +82,7 @@ class SwitchConnectionManager::SwitchSimulatorForProcon
   def init_devices
     if path = SwitchConnectionManager::DeviceProconFinder.find
       @procon = File.open(path, "w+b")
-      puts "proconのデバイスファイルは#{path}を使います"
+      puts "Use #{path} as procon's device file"
     else
       raise "not found procon error" # TODO erro class
     end
