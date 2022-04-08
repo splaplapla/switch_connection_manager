@@ -74,7 +74,7 @@ class SwitchConnectionManager::SwitchSimulatorForProcon
 
   def write(data)
     to_stdout(">>> #{data}")
-    @gadget.write_nonblock([data].pack("H*"))
+    @procon.write_nonblock([data].pack("H*"))
   rescue IO::EAGAINWaitReadable
     retry
   end
