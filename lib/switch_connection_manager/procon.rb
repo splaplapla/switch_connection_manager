@@ -133,7 +133,7 @@ class SwitchConnectionManager::Procon
     @input_report_receiver_thread =
       Thread.start do
         loop do
-          blocking_read
+          read
           sleep(0.03)
         rescue IO::EAGAINWaitReadable
           retry
