@@ -69,6 +69,9 @@ class SwitchConnectionManager::Procon
     if @status == :connected && (configuration_step = @configuration_steps.shift)
       send_to_procon(configuration_step)
       return
+    else
+      send_to_procon("100f0001404000014040")
+      slee(0.03)
     end
   end
 
