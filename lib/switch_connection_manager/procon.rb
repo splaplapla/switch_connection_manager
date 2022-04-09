@@ -71,7 +71,7 @@ class SwitchConnectionManager::Procon
       return
     else
       send_to_procon("100f0001404000014040")
-      slee(0.03)
+      sleep(0.03)
     end
   end
 
