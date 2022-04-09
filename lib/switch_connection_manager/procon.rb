@@ -91,11 +91,19 @@ class SwitchConnectionManager::Procon
     puts(text)
   end
 
+  def blocking_read
+    raw_data = procon.read(64)
+    to_stdout("<<< #{raw_data.unpack("H*").first}")
+    return raw_data
+  rescue IO::EAGAINWaitReadable
+    retry
+  end
+
   def start_input_report_receiver_thread
     @input_report_receiver_thread =
       Thread.start do
         loop do
-          read
+          blocking_read
           sleep(0.03)
         rescue IO::EAGAINWaitReadable
           retry
