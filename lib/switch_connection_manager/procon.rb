@@ -2,6 +2,7 @@
 class SwitchConnectionManager::Procon
   class Status
     attr_accessor :value
+
     def initialize
       @value = :disconnected
     end
@@ -93,7 +94,7 @@ class SwitchConnectionManager::Procon
       end
     end
 
-    if @status.connected? && (configuration_step = @configuration_steps.shift)
+    if (configuration_step = @configuration_steps.shift)
       send_to_procon(configuration_step)
       return
     else
