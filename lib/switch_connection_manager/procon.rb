@@ -95,6 +95,10 @@ class SwitchConnectionManager::Procon
     @procon.write_nonblock([data].pack("H*"))
   rescue IO::EAGAINWaitReadable
     retry
+  rescue Errno::EINVAL => e
+    puts e.message
+    sleep(1)
+    retry
   end
 
   def init_devices
