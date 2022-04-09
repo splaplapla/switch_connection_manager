@@ -5,11 +5,34 @@ class SwitchConnectionManager::Procon
   # TODO 切断したらstatusをdisconnectedにする
   # TODO switchと接続していない状態でもジャイロを動くようにする
 
+  CONFIGURATION_STEPS = [
+    "01000000000000000000480000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-48
+    "01010000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-02
+    "01020000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-08
+    "01030000000000000000100060000010000000000000000000000000000000000000000000000000000000000000000000", # 01-10-0060, Serial number
+    "0104000000000000000010506000000d000000000000000000000000000000000000000000000000000000000000000000", # 01-10-5060, Controller Color
+    "0105000000000000000001044c748786451c00043c4e696e74656e646f2053776974636800000000006800c0883cd37900", # 01-01, Bluetooth manual pairing
+    "01070000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-04, Trigger buttons elapsed time
+    "01080000000000000000108060000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-8060, Factory Sensor and Stick device parameters
+    "01090000000000000000109860000012000000000000000000000000000000000000000000000000000000000000000000", # 01-10-9860, Factory Stick device parameters 2
+    "010a0000000000000000101080000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-1080, User Analog sticks calibration
+    "100b0001404000014040", # unkown
+    "010c0000000000000000103d60000019000000000000000000000000000000000000000000000000000000000000000000", # 01-10-3d60, Factory configuration & calibration 2
+    "010d0000000000000000102880000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-2880, User 6-Axis Motion Sensor calibration
+    "010e0000000000000000400100000000000000000000000000000000000000000000000000000000000000000000000000", # 01-40
+    "100f0001404000014040", # unkown
+    "01000000000000000000480100000000000000000000000000000000000000000000000000000000000000000000000000",
+    "01010001404000014040480100000000000000000000000000000000000000000000000000000000000000000000000000",
+    "01020000000000000000300100000000000000000000000000000000000000000000000000000000000000000000000000",
+  ]
+
   attr_accessor :procon
 
   def initialize
     @status = :disconnected
     @input_report_receiver_thread = nil
+    @connected_step_index = 0
+    @configuration_steps = CONFIGURATION_STEPS.dup
   end
 
   def run
@@ -23,53 +46,49 @@ class SwitchConnectionManager::Procon
   end
 
   def do_once
-    if @status == :connected
-      raise AlreadyConnectedError
-    end
-
     if @status == :disconnected
       send_initialize_data
       @status = :sent_initialize_data
       return nil
     end
 
-    raw_data = read
+    if @status == :sent_initialize_data
+      raw_data = read
+      data = raw_data.unpack("H*").first
+      case data
+      when /^8101/
+        return send_to_procon "8002"
+      when /^8102/
+        return send_to_procon "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
+      when /^21.+?8003000/
+        out = send_to_procon "8004"
+        start_input_report_receiver_thread
+        @status = :connected
+        return out
+      end
+    end
 
-    case first_data_part = raw_data[0..1].unpack("H*").first
-    when "8101"
-      response "8002"
-    when "8102"
-      response "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
-    when /^21\d/
-      out = response "8004"
-      start_input_report_receiver_thread
-      @status = :connected
-      return out
+    if @status == :connected
+      configuration_step = @configuration_steps.shift
+      send_to_procon(configuration_step)
+      return
     end
   end
 
   def send_initialize_data
-    write("0000")
-    write("0000")
-    write("8005")
-    write("0000")
-    write("8001")
+    send_to_procon("0000")
+    send_to_procon("0000")
+    send_to_procon("8005")
+    send_to_procon("0000")
+    send_to_procon("8001")
   end
 
-  def response(data)
+  def send_to_procon(data)
     write(data)
     return data
   end
 
   private
-
-  def read
-    raw_data = procon.read_nonblock(64)
-    to_stdout("<<< #{raw_data.unpack("H*").first}")
-    return raw_data
-  rescue IO::EAGAINWaitReadable
-    retry
-  end
 
   def write(data)
     to_stdout(">>> #{data}")
@@ -89,6 +108,14 @@ class SwitchConnectionManager::Procon
 
   def to_stdout(text)
     puts(text)
+  end
+
+  def read
+    raw_data = procon.read_nonblock(64)
+    to_stdout("<<< #{raw_data.unpack("H*").first}")
+    return raw_data
+  rescue IO::EAGAINWaitReadable
+    retry
   end
 
   def blocking_read
