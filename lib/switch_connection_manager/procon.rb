@@ -159,7 +159,7 @@ class SwitchConnectionManager::Procon
   end
 
   def connection_sleep
-    sleep(3)
+    sleep(1)
   end
 
   def start_input_report_receiver_thread
