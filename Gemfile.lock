@@ -29,6 +29,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-20
+  armv7l-linux-eabihf
 
 DEPENDENCIES
   pry
