@@ -68,8 +68,7 @@ class SwitchConnectionManager::Procon
       end
     end
 
-    if @status == :connected
-      configuration_step = @configuration_steps.shift
+    if @status == :connected && (configuration_step = @configuration_steps.shift)
       send_to_procon(configuration_step)
       return
     end
