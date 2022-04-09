@@ -81,6 +81,8 @@ class SwitchConnectionManager::Procon
     if @status.sent_initialize_data?
       raw_data = read
       data = raw_data.unpack("H*").first
+
+      binding.pry
       case data
       when /^8101/
         return send_to_procon "8002"
@@ -153,7 +155,7 @@ class SwitchConnectionManager::Procon
 
   def blocking_read
     raw_data = procon.read(64)
-    to_stdout("<<< #{raw_data.unpack("H*").first}")
+    # to_stdout("<<< #{raw_data.unpack("H*").first}")
     return raw_data
   rescue IO::EAGAINWaitReadable
     retry
