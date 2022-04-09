@@ -157,7 +157,7 @@ class SwitchConnectionManager::Procon
 
   def blocking_read
     raw_data = procon.read(64)
-    # to_stdout("<<< #{raw_data.unpack("H*").first}")
+    to_stdout("<<< #{raw_data.unpack("H*").first}")
     return raw_data
   rescue IO::EAGAINWaitReadable
     retry
