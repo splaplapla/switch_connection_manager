@@ -6,6 +6,7 @@ describe SwitchConnectionManager::Procon do
 
   describe '#do_once' do
     before do
+      allow(simulator).to receive(:connection_sleep)
       allow(simulator).to receive(:to_stdout)
     end
 

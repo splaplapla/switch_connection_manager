@@ -1,5 +1,34 @@
 # 対プロコンに対して使う用です
 class SwitchConnectionManager::Procon
+  class Status
+    attr_accessor :value
+    def initialize
+      @value = :disconnected
+    end
+
+    def sent_initialize_data?
+      @value == :sent_initialize_data
+    end
+
+    def disconnected?
+      @value == :disconnected
+    end
+
+    def connected?
+      @value == :connected
+    end
+
+    def sent_initialize_data!
+      @value = :sent_initialize_data
+      puts "Change status to sent_initialize_data"
+    end
+
+    def connected!
+      @value == :connected
+      puts "Change status to connected"
+    end
+  end
+
   class AlreadyConnectedError < StandardError; end
   # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
   # TODO 切断したらstatusをdisconnectedにする
@@ -27,7 +56,7 @@ class SwitchConnectionManager::Procon
   attr_accessor :procon
 
   def initialize
-    @status = :disconnected
+    @status = Status.new
     @input_report_receiver_thread = nil
     @connected_step_index = 0
     @configuration_steps = CONFIGURATION_STEPS.dup
@@ -38,19 +67,17 @@ class SwitchConnectionManager::Procon
 
     loop do
       do_once
-    rescue AlreadyConnectedError
-      sleep(2)
     end
   end
 
   def do_once
-    if @status == :disconnected
+    if @status.disconnected?
       send_initialize_data
-      @status = :sent_initialize_data
+      @status.sent_initialize_data!
       return nil
     end
 
-    if @status == :sent_initialize_data
+    if @status.sent_initialize_data?
       raw_data = read
       data = raw_data.unpack("H*").first
       case data
@@ -61,17 +88,18 @@ class SwitchConnectionManager::Procon
       when /^21.+?8003000/
         out = send_to_procon "8004"
         start_input_report_receiver_thread
-        @status = :connected
+        @status.connected!
         return out
       end
     end
 
-    if @status == :connected && (configuration_step = @configuration_steps.shift)
+    if @status.connected? && (configuration_step = @configuration_steps.shift)
       send_to_procon(configuration_step)
       return
     else
       send_to_procon("100f0001404000014040")
-      sleep(3)
+      connection_sleep
+      return
     end
   end
 
@@ -128,6 +156,10 @@ class SwitchConnectionManager::Procon
     return raw_data
   rescue IO::EAGAINWaitReadable
     retry
+  end
+
+  def connection_sleep
+    sleep(3)
   end
 
   def start_input_report_receiver_thread
