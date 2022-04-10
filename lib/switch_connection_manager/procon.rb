@@ -162,7 +162,7 @@ class SwitchConnectionManager::Procon
   end
 
   def non_blocking_read_with_timeout
-    timeout = Time.now + 5
+    timeout = Time.now + 1
 
     begin
       read_once
