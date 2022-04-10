@@ -66,6 +66,16 @@ class SwitchConnectionManager::Procon
   def run
     init_devices
 
+    at_exit do
+      if procon
+        send_to_procon("0000")
+        send_to_procon("0000")
+        send_to_procon("8005")
+        send_to_procon("0000")
+        procon.close
+      end
+    end
+
     loop do
       do_once
     end
