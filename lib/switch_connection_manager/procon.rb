@@ -197,7 +197,7 @@ class SwitchConnectionManager::Procon
   end
 
   def start_input_report_receiver_thread
-    sleep(1)
+    sleep(0.5)
     @input_report_receiver_thread =
       Thread.start do
         loop do
