@@ -63,7 +63,7 @@ class SwitchConnectionManager::Procon
 
       case data
       when /^810103000000000000/
-        send_to_procon("100f0001404000014040")
+        return send_to_procon "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
         non_blocking_read
         return
       when /^81010003/ # 810100032dbd42e9b69800 的なやつがくる
@@ -83,7 +83,7 @@ class SwitchConnectionManager::Procon
         @status.connected!
         return out
       else
-        send_to_procon("100f0001404000014040")
+        send_to_procon("100f00014040000140401")
         non_blocking_read_with_timeout
         return
       end
