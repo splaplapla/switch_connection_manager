@@ -28,9 +28,15 @@ class SwitchConnectionManager::Procon
       @value = :connected
       puts "Change status to connected"
     end
+
+    def reset!
+      @value = :disconnected
+      puts "Change status to disconnected, because stuck"
+    end
   end
 
   class AlreadyConnectedError < StandardError; end
+  class ReadTimeoutError < StandardError; end
   # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
   # TODO 切断したらstatusをdisconnectedにする
   # TODO switchと接続していない状態でもジャイロを動くようにする
@@ -86,13 +92,13 @@ class SwitchConnectionManager::Procon
     end
 
     if @status.sent_initialize_data?
-      raw_data = read
+      raw_data = non_blocking_read_with_timeout
       data = raw_data.unpack("H*").first
 
       case data
       when /^810103000000000000/
         send_to_procon("100f0001404000014040")
-        nonblocking_read
+        non_blocking_read
         return
       when /^81010003/ # 810100032dbd42e9b69800 的なやつがくる
         return send_to_procon "8002"
@@ -112,7 +118,7 @@ class SwitchConnectionManager::Procon
         return out
       else
         send_to_procon("100f0001404000014040")
-        nonblocking_read
+        non_blocking_read
         return
       end
     end
@@ -129,6 +135,9 @@ class SwitchConnectionManager::Procon
       connection_sleep
       return
     end
+  rescue ReadTimeoutError
+    @status.reset!
+    retry
   end
 
   def send_initialize_data
@@ -183,8 +192,19 @@ class SwitchConnectionManager::Procon
     retry
   end
 
-  def nonblocking_read
+  def non_blocking_read
     read
+  end
+
+  def non_blocking_read_with_timeout
+    timeout = Time.now + 5
+
+    begin
+      read_once
+    rescue IO::EAGAINWaitReadable
+      raise(ReadTimeoutError) if timeout < Time.now
+      retry
+    end
   end
 
   def blocking_read
