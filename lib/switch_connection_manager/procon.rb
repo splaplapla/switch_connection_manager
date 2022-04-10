@@ -152,14 +152,10 @@ class SwitchConnectionManager::Procon
     return raw_data
   end
 
-  def read
+  def non_blocking_read
     read_once
   rescue IO::EAGAINWaitReadable
     retry
-  end
-
-  def non_blocking_read
-    read
   end
 
   def non_blocking_read_with_timeout
@@ -189,9 +185,6 @@ class SwitchConnectionManager::Procon
       Thread.start do
         loop do
           blocking_read
-        rescue IO::EAGAINWaitReadable
-          sleep(0.03)
-          retry
         end
       end
   end
