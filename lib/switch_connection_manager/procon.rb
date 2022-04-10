@@ -25,7 +25,7 @@ class SwitchConnectionManager::Procon
     end
 
     def connected!
-      @value == :connected
+      @value = :connected
       puts "Change status to connected"
     end
   end
