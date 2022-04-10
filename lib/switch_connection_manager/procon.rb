@@ -1,40 +1,5 @@
 # 対プロコンに対して使う用です
 class SwitchConnectionManager::Procon
-  class Status
-    attr_accessor :value
-
-    def initialize
-      @value = :disconnected
-    end
-
-    def sent_initialize_data?
-      @value == :sent_initialize_data
-    end
-
-    def disconnected?
-      @value == :disconnected
-    end
-
-    def connected?
-      @value == :connected
-    end
-
-    def sent_initialize_data!
-      @value = :sent_initialize_data
-      puts "Change status to sent_initialize_data"
-    end
-
-    def connected!
-      @value = :connected
-      puts "Change status to connected"
-    end
-
-    def reset!
-      @value = :disconnected
-      puts "Change status to disconnected, because stuck"
-    end
-  end
-
   class AlreadyConnectedError < StandardError; end
   class ReadTimeoutError < StandardError; end
   # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
@@ -63,7 +28,7 @@ class SwitchConnectionManager::Procon
   attr_accessor :procon
 
   def initialize
-    @status = Status.new
+    @status = SwitchConnectionManager::ProconConnectionStatus.new
     @input_report_receiver_thread = nil
     @connected_step_index = 0
     @configuration_steps = CONFIGURATION_STEPS.dup + CONFIGURATION_STEPS.dup
