@@ -157,11 +157,10 @@ class SwitchConnectionManager::ProconSimulator
   end
 
   def init_devices
+    SwitchConnectionManager::UsbDeviceController.init
     @gadget = File.open('/dev/hidg0', "w+b")
 
-    at_exit do
-      @procon&.close
-    end
+    SwitchConnectionManager::UsbDeviceController.reset
   end
 
   def to_stdout(text)
