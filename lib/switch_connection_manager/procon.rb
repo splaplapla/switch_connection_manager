@@ -110,6 +110,7 @@ class SwitchConnectionManager::Procon
         @status.connected!
         return out
       else
+        send_to_procon("100f0001404000014040")
         nonblocking_read
       end
     end
@@ -123,7 +124,6 @@ class SwitchConnectionManager::Procon
 
       return
     else
-      # send_to_procon("100f0001404000014040")
       connection_sleep
       return
     end
