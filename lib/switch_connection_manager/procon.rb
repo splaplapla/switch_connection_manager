@@ -31,7 +31,8 @@ class SwitchConnectionManager::Procon
     @status = SwitchConnectionManager::ProconConnectionStatus.new
     @input_report_receiver_thread = nil
     @connected_step_index = 0
-    @configuration_steps = CONFIGURATION_STEPS.dup + CONFIGURATION_STEPS.dup
+    @configuration_steps = []
+    4.times { CONFIGURATION_STEPS.each { |x| @configuration_steps } }
   end
 
   def run
