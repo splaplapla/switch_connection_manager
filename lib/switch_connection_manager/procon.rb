@@ -60,7 +60,7 @@ class SwitchConnectionManager::Procon
     @status = Status.new
     @input_report_receiver_thread = nil
     @connected_step_index = 0
-    @configuration_steps = CONFIGURATION_STEPS.dup
+    @configuration_steps = CONFIGURATION_STEPS.dup + CONFIGURATION_STEPS.dup
   end
 
   def run
