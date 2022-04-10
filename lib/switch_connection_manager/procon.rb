@@ -100,6 +100,11 @@ class SwitchConnectionManager::Procon
 
     if (configuration_step = @configuration_steps.shift)
       send_to_procon(configuration_step)
+      begin
+        read_once
+      rescue IO::EAGAINWaitReadable
+      end
+
       return
     else
       # send_to_procon("100f0001404000014040")
@@ -147,10 +152,15 @@ class SwitchConnectionManager::Procon
     puts(text)
   end
 
-  def read
+  # @raise [IO::EAGAINWaitReadable]
+  def read_once
     raw_data = procon.read_nonblock(64)
     to_stdout("<<< #{raw_data.unpack("H*").first}")
     return raw_data
+  end
+
+  def read
+    read_once
   rescue IO::EAGAINWaitReadable
     retry
   end
@@ -159,8 +169,6 @@ class SwitchConnectionManager::Procon
     raw_data = procon.read(64)
     to_stdout("<<< #{raw_data.unpack("H*").first}")
     return raw_data
-  rescue IO::EAGAINWaitReadable
-    retry
   end
 
   def connection_sleep
@@ -168,6 +176,7 @@ class SwitchConnectionManager::Procon
   end
 
   def start_input_report_receiver_thread
+    sleep(5)
     @input_report_receiver_thread =
       Thread.start do
         loop do
