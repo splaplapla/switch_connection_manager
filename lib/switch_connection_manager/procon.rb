@@ -32,7 +32,7 @@ class SwitchConnectionManager::Procon
     @input_report_receiver_thread = nil
     @connected_step_index = 0
     @configuration_steps = []
-    4.times { CONFIGURATION_STEPS.each { |x| @configuration_steps } }
+    4.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
   end
 
   def run
