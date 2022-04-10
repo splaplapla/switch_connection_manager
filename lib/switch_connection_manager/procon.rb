@@ -109,6 +109,8 @@ class SwitchConnectionManager::Procon
         start_input_report_receiver_thread
         @status.connected!
         return out
+      else
+        nonblocking_read
       end
     end
 
@@ -177,6 +179,10 @@ class SwitchConnectionManager::Procon
     read_once
   rescue IO::EAGAINWaitReadable
     retry
+  end
+
+  def nonblocking_read
+    read
   end
 
   def blocking_read
