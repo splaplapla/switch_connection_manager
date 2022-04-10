@@ -99,19 +99,20 @@ class SwitchConnectionManager::Procon
         return send_to_procon "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
       when /^21.+?8003000/
         out = send_to_procon "8004"
-        10.times do
-          begin
-            read_once
-          rescue IO::EAGAINWaitReadable
-            sleep(0.2)
-          end
-        end
+        # 10.times do
+        #   begin
+        #     read_once
+        #   rescue IO::EAGAINWaitReadable
+        #     sleep(0.2)
+        #   end
+        # end
         start_input_report_receiver_thread
         @status.connected!
         return out
       else
         send_to_procon("100f0001404000014040")
         nonblocking_read
+        return
       end
     end
 
