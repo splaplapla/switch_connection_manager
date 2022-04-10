@@ -84,7 +84,7 @@ class SwitchConnectionManager::Procon
         return out
       else
         send_to_procon("100f0001404000014040")
-        non_blocking_read
+        non_blocking_read_with_timeout
         return
       end
     end
