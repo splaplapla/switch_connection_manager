@@ -69,6 +69,10 @@ class SwitchConnectionManager::Procon
     at_exit do
       if procon
         send_to_procon("0000")
+        send_to_procon("0000")
+        send_to_procon("8005")
+        send_to_procon("0000")
+        send_to_procon("8001")
         procon.close
       end
     end
