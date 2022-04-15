@@ -17,6 +17,7 @@ def procon
 end
 
 def write(data)
+  to_stdout(">>> #{data}")
   procon.write([data].pack("H*"))
 end
 
@@ -45,7 +46,6 @@ def non_blocking_read_with_timeout
 end
 
 
-write("8005")
 write("0000")
 write("0000")
 write("8005")
