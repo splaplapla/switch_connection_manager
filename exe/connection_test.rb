@@ -4,6 +4,8 @@
 require "bundler/setup"
 require "switch_connection_manager"
 
+class ReadTimeoutError < StandardError; end
+
 def procon
   return @procon if defined?(@procon)
   if path = SwitchConnectionManager::DeviceProconFinder.find
@@ -42,8 +44,13 @@ def non_blocking_read_with_timeout
   end
 end
 
-write "01010001404000014040033f"
+write("0000")
+write("0000")
+write("8005")
+write("0000")
+write("8001")
 
+# write "01010001404000014040033f"
 10.times do
   non_blocking_read_with_timeout
 end
