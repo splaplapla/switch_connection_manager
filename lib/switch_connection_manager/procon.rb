@@ -8,8 +8,8 @@ class SwitchConnectionManager::Procon
 
   CONFIGURATION_STEPS = [
     "01000000000000000000480000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-48
-    "01010000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-02
-    "01020000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-08
+    "01010000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-02 device request
+    "01020000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-08 Set shipment low power state
     "01030000000000000000100060000010000000000000000000000000000000000000000000000000000000000000000000", # 01-10-0060, Serial number
     "0104000000000000000010506000000d000000000000000000000000000000000000000000000000000000000000000000", # 01-10-5060, Controller Color
     "0105000000000000000001044c748786451c00043c4e696e74656e646f2053776974636800000000006800c0883cd37900", # 01-01, Bluetooth manual pairing
@@ -19,10 +19,10 @@ class SwitchConnectionManager::Procon
     "010a0000000000000000101080000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-1080, User Analog sticks calibration
     "010c0000000000000000103d60000019000000000000000000000000000000000000000000000000000000000000000000", # 01-10-3d60, Factory configuration & calibration 2
     "010d0000000000000000102880000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-2880, User 6-Axis Motion Sensor calibration
-    "010e0000000000000000400100000000000000000000000000000000000000000000000000000000000000000000000000", # 01-40
-    "01000000000000000000480100000000000000000000000000000000000000000000000000000000000000000000000000",
-    "01010001404000014040480100000000000000000000000000000000000000000000000000000000000000000000000000",
-    "01020000000000000000300100000000000000000000000000000000000000000000000000000000000000000000000000",
+    # "010e00000000000000004001", # 01-40. 01-03-30で有効化するので不要
+    "010000000000000000004800", # vibration
+    # "0101000000000000000030f0", # led
+    # "010200000000000000003801", # home button led
   ]
 
   attr_accessor :procon
@@ -32,15 +32,25 @@ class SwitchConnectionManager::Procon
     @input_report_receiver_thread = nil
     @connected_step_index = 0
     @configuration_steps = []
-    6.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
+    1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
   end
 
   def run
     init_devices
 
     at_exit do
+      $terminated = true
       if procon
-        send_initialize_data
+        begin
+          non_blocking_read_with_timeout
+        rescue ReadTimeoutError
+        end
+        send_to_procon("8005")
+        send_to_procon("010200000000000000003800") # off home bottun led
+        4.times do
+          non_blocking_read_with_timeout
+        rescue ReadTimeoutError
+        end
         procon.close
       end
     end
@@ -63,37 +73,31 @@ class SwitchConnectionManager::Procon
 
       case data
       when /^810103000000000000/
-        return send_to_procon "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
+        return send_to_procon "010000000000000000000330"
         non_blocking_read
         return
       when /^81010003/ # 810100032dbd42e9b69800 的なやつがくる
         return send_to_procon "8002"
       when /^810200000000000000000000000000000000000000000000000000/
-        return send_to_procon "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
+        return send_to_procon "010000000000000000000330"
       when /^21.+?8003000/
+        send_to_procon "010200000000000000003801" # home button led
+        begin
+          non_blocking_read_with_timeout
+        rescue ReadTimeoutError
+        end
         out = send_to_procon "8004"
         start_input_report_receiver_thread
         @status.connected!
         return out
       else
-        send_to_procon("100f00014040000140401")
+        send_to_procon("100f00014040000140400")
         non_blocking_read_with_timeout
         return
       end
     end
 
-    if (configuration_step = @configuration_steps.shift)
-      send_to_procon(configuration_step)
-      begin
-        read_once
-      rescue IO::EAGAINWaitReadable
-      end
-
-      return
-    else
-      connection_sleep
-      return
-    end
+    connection_sleep
   rescue ReadTimeoutError
     @status.reset!
     retry
@@ -176,8 +180,17 @@ class SwitchConnectionManager::Procon
     sleep(0.5)
     @input_report_receiver_thread =
       Thread.start do
+        break if $terminated
         loop do
-          blocking_read
+          if (configuration_step = @configuration_steps.shift)
+            send_to_procon(configuration_step)
+          end
+
+          begin
+            non_blocking_read_with_timeout
+          rescue ReadTimeoutError
+            print "."
+          end
         end
       end
   end
