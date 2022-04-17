@@ -182,9 +182,10 @@ class SwitchConnectionManager::Procon
           if @internal_status.has_unreceived_command?
             send_to_procon(@internal_status.unreceived_byte)
           else
-            configuration_step = @configuration_steps.shift
-            @internal_status.mark_as_send(step: configuration_step)
-            send_to_procon(@internal_status.byte_of(step: configuration_step))
+            if(configuration_step = @configuration_steps.shift)
+              @internal_status.mark_as_send(step: configuration_step)
+              send_to_procon(@internal_status.byte_of(step: configuration_step))
+            end
           end
 
           begin
