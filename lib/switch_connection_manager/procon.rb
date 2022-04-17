@@ -76,13 +76,9 @@ class SwitchConnectionManager::Procon
       data = raw_data.unpack("H*").first
 
       case data
-      when /^810103000000000000/
-        return send_to_procon "010000000000000000000330"
-        non_blocking_read
-        return
-      when /^81010003/ # 810100032dbd42e9b69800 的なやつがくる
+      when /^8101/ # 810100032dbd42e9b69800 的なやつがくる
         return send_to_procon "8002"
-      when /^810200000000000000000000000000000000000000000000000000/
+      when /^8102/
         return send_to_procon "010100000000000000000330"
       when /^21.+?8003000/
         out = send_to_procon "8004"
