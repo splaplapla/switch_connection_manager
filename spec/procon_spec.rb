@@ -21,7 +21,7 @@ describe SwitchConnectionManager::Procon do
       )
       expect(simulator.do_once).to be_nil
       expect(simulator.do_once).to eq("8002")
-      expect(simulator.do_once).to eq("01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000")
+      expect(simulator.do_once).to eq("010000000000000000000330")
       expect(simulator.do_once).to eq("8004") # 8004を送った後
       expect(simulator.do_once).to eq(nil)
     end
