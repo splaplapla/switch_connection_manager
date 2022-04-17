@@ -83,7 +83,7 @@ class SwitchConnectionManager::Procon
       when /^81010003/ # 810100032dbd42e9b69800 的なやつがくる
         return send_to_procon "8002"
       when /^810200000000000000000000000000000000000000000000000000/
-        return send_to_procon "010000000000000000000330"
+        return send_to_procon "010100000000000000000330"
       when /^21.+?8003000/
         out = send_to_procon "8004"
         start_input_report_receiver_thread
