@@ -85,11 +85,6 @@ class SwitchConnectionManager::Procon
       when /^810200000000000000000000000000000000000000000000000000/
         return send_to_procon "010000000000000000000330"
       when /^21.+?8003000/
-        send_to_procon "010200000000000000003801" # home button led
-        begin
-          non_blocking_read_with_timeout
-        rescue ReadTimeoutError
-        end
         out = send_to_procon "8004"
         start_input_report_receiver_thread
         @status.connected!
