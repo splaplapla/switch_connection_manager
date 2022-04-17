@@ -20,7 +20,7 @@ class SwitchConnectionManager::Procon
     "010c0000000000000000103d60000019000000000000000000000000000000000000000000000000000000000000000000", # 01-10-3d60, Factory configuration & calibration 2
     "010d0000000000000000102880000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-2880, User 6-Axis Motion Sensor calibration
     # "010e00000000000000004001", # 01-40. 01-03-30で有効化するので不要
-    "010000000000000000004800", # vibration
+    # "010000000000000000004800", # vibration
     # "0101000000000000000030f0", # led
     # "010200000000000000003801", # home button led
   ]
@@ -33,7 +33,10 @@ class SwitchConnectionManager::Procon
     @connected_step_index = 0
     @configuration_steps = []
     @internal_status = SwitchConnectionManager::ProconInternalStatus.new
-    1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
+    # 1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
+    SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
+      @configuration_steps << step
+    end
   end
 
   def run
@@ -183,13 +186,18 @@ class SwitchConnectionManager::Procon
       Thread.start do
         break if $terminated
         loop do
-          if (configuration_step = @configuration_steps.shift) # enable_home_button_light みたいのが入っている
-            @internal_status.mark_as_send(step: configuration_step)
-            send_to_procon(@internal_status.byte_of(step: configuration_step))
+          if (configuration_step = @configuration_steps.shift)
+            if @internal_status.has_unreceived_command?
+              send_to_procon(@internal_status.unreceived_byte)
+            else
+              @internal_status.mark_as_send(step: configuration_step)
+              send_to_procon(@internal_status.byte_of(step: configuration_step))
+            end
           end
 
           begin
-            non_blocking_read_with_timeout
+            raw_data = non_blocking_read_with_timeout
+            @internal_status.receive(raw_data: raw_data)
           rescue ReadTimeoutError
             print "."
           end

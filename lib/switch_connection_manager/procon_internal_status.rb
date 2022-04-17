@@ -89,7 +89,7 @@ class SwitchConnectionManager::ProconInternalStatus
   ]
 
   SUB_COMMANDS_ON_START = [
-    :enable_player_light,
+    # :enable_player_light,
     :enable_home_button_light,
     :disable_vibration,
   ]
@@ -115,21 +115,21 @@ class SwitchConnectionManager::ProconInternalStatus
     @sub_command_received_status = CommandReceivedStatus.new
   end
 
-  def byte_of(step: )
-    public_send(step)
-  end
-
-  def unreceived_byte
-    raise "使い方が違います" unless has_unreceived?
-    byte_of(step: @sub_command_received_status.step)
-  end
-
   def mark_as_send(step: )
     name = SUB_COMMANDS_NAME_TABLE[step]
     @sub_command_received_status.sent!(step: step)
   end
 
-  def has_unreceived?
+  def byte_of(step: )
+    public_send(step)
+  end
+
+  def unreceived_byte
+    raise "使い方が違います" unless has_unreceived_command?
+    byte_of(step: @sub_command_received_status.step)
+  end
+
+  def has_unreceived_command?
     return false if @sub_command_received_status.init?
     not @sub_command_received_status.received_ack?
   end

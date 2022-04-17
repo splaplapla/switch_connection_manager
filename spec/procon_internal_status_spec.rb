@@ -67,10 +67,10 @@ describe SwitchConnectionManager::ProconInternalStatus do
     end
   end
 
-  describe '#has_unreceived?' do
+  describe '#has_unreceived_command?' do
     let(:step) { :enable_player_light }
 
-    subject { status.has_unreceived? }
+    subject { status.has_unreceived_command? }
 
     context '初期状態' do
       it { expect(subject).to eq(false) }
