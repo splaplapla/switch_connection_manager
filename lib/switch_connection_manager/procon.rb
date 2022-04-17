@@ -181,7 +181,9 @@ class SwitchConnectionManager::Procon
       Thread.start do
         break if $terminated
         loop do
+          puts "[loop] before first if"
           if (configuration_step = @configuration_steps.shift)
+            puts "[loop] in first if"
             if @internal_status.has_unreceived_command?
               send_to_procon(@internal_status.unreceived_byte)
             else
@@ -189,6 +191,7 @@ class SwitchConnectionManager::Procon
               send_to_procon(@internal_status.byte_of(step: configuration_step))
             end
           end
+          puts "[loop] after first if"
 
           begin
             raw_data = non_blocking_read_with_timeout
