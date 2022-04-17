@@ -64,6 +64,12 @@ describe SwitchConnectionManager::ProconInternalStatus do
         before { status.receive(raw_data: raw_data) }
         it { expect(subject).to eq(true) }
       end
+
+      context '異なるデータを受け取ったとき' do
+        let(:raw_data) { ["2143810080007cb878903870098038"].pack("H*") }
+        before { status.receive(raw_data: raw_data) }
+        it { expect(subject).to eq(false) }
+      end
     end
   end
 
@@ -116,6 +122,24 @@ describe SwitchConnectionManager::ProconInternalStatus do
         status.receive(raw_data: raw_data)
       end
       it { expect { subject }.to raise_error(RuntimeError) }
+    end
+  end
+
+  describe '#receive' do
+    let(:step) { :enable_home_button_light }
+
+    before do
+      status.mark_as_send(step: step)
+    end
+
+    subject { status.receive(raw_data: raw_data);  }
+
+    context '異なるデータを受け取ったとき' do
+      let(:raw_data) { ["2143810080007cb878903870098030"].pack("H*") }
+      before do
+        status.receive(raw_data: raw_data)
+      end
+      it { expect(subject).to eq(false) }
     end
   end
 end

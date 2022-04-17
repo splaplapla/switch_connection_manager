@@ -25,6 +25,10 @@ class SwitchConnectionManager::ProconInternalStatus
     def initialize(sub_command: )
       @sub_command = sub_command
     end
+
+    def sub_command_name
+      SUB_COMMANDS_ID_TABLE[@sub_command]
+    end
   end
 
   class CommandReceivedStatus
@@ -90,8 +94,8 @@ class SwitchConnectionManager::ProconInternalStatus
 
   SUB_COMMANDS_ON_START = [
     # :enable_player_light,
-    :enable_home_button_light,
     :disable_vibration,
+    :enable_home_button_light,
   ]
 
   SUB_COMMANDS_ON_END = [
@@ -121,8 +125,9 @@ class SwitchConnectionManager::ProconInternalStatus
   end
 
   def byte_of(step: )
+    out = public_send(step)
     increment_counter
-    public_send(step)
+    return out
   end
 
   def unreceived_byte
@@ -140,8 +145,11 @@ class SwitchConnectionManager::ProconInternalStatus
     case data
     when /^21/
       response = HIDSubCommandResponse.parse(data)
-      step = SUB_COMMANDS_ID_TABLE[response.sub_command]
-      @sub_command_received_status.received_ack!
+      if SUB_COMMANDS_NAME_TABLE[@sub_command_received_status.step] == response.sub_command_name
+        @sub_command_received_status.received_ack!
+      else
+        false
+      end
     end
   end
 
