@@ -1,7 +1,7 @@
 class SwitchConnectionManager::ProconInternalStatus
   class HIDSubCommandRequest
     def initialize(counter: , sub_command: , arg: )
-      @counter = counter.to_i.to_s(16)
+      @counter = counter.to_s(16)
       @sub_command = sub_command
       @arg = arg
     end
@@ -163,9 +163,9 @@ class SwitchConnectionManager::ProconInternalStatus
   def increment_counter
     @counter = @counter + 1
     if @counter >= 256
-      @counter = "0"
+      @counter = 0
     else
-      @counter.to_s
+      @counter
     end
   end
 end
