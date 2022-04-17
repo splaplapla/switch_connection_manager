@@ -121,6 +121,7 @@ class SwitchConnectionManager::ProconInternalStatus
   end
 
   def byte_of(step: )
+    increment_counter
     public_send(step)
   end
 
