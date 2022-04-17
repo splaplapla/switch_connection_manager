@@ -90,8 +90,6 @@ class SwitchConnectionManager::Procon
         @status.connected!
         return out
       else
-        send_to_procon("100f00014040000140400")
-        non_blocking_read_with_timeout
         return
       end
     end
