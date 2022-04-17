@@ -32,6 +32,7 @@ class SwitchConnectionManager::Procon
     @input_report_receiver_thread = nil
     @connected_step_index = 0
     @configuration_steps = []
+    @internal_status = SwitchConnectionManager::ProconInternalStatus.new
     1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
   end
 
@@ -182,8 +183,9 @@ class SwitchConnectionManager::Procon
       Thread.start do
         break if $terminated
         loop do
-          if (configuration_step = @configuration_steps.shift)
-            send_to_procon(configuration_step)
+          if (configuration_step = @configuration_steps.shift) # enable_home_button_light みたいのが入っている
+            @internal_status.mark_as_send(step: configuration_step)
+            send_to_procon(@internal_status.byte_of(step: configuration_step))
           end
 
           begin
