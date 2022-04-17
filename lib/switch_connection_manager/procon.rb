@@ -81,6 +81,18 @@ class SwitchConnectionManager::Procon
       when /^8102/
         return send_to_procon "010100000000000000000330"
       when /^21.+?8003000/
+
+        loop do
+          if @internal_status.has_unreceived_command?
+            send_to_procon(@internal_status.unreceived_byte)
+          else
+            if(configuration_step = @configuration_steps.shift)
+              @internal_status.mark_as_send(step: configuration_step)
+              send_to_procon(@internal_status.byte_of(step: configuration_step))
+            end
+          end
+        end
+
         out = send_to_procon "8004"
         start_input_report_receiver_thread
         @status.connected!
@@ -175,18 +187,8 @@ class SwitchConnectionManager::Procon
       Thread.start do
         break if $terminated
         loop do
-          if @internal_status.has_unreceived_command?
-            send_to_procon(@internal_status.unreceived_byte)
-          else
-            if(configuration_step = @configuration_steps.shift)
-              @internal_status.mark_as_send(step: configuration_step)
-              send_to_procon(@internal_status.byte_of(step: configuration_step))
-            end
-          end
-
           begin
             raw_data = non_blocking_read_with_timeout
-            @internal_status.receive(raw_data: raw_data)
           rescue ReadTimeoutError
             print "."
           end
