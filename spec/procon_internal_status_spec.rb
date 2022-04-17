@@ -4,7 +4,7 @@ describe SwitchConnectionManager::ProconInternalStatus do
   let(:status) { SwitchConnectionManager::ProconInternalStatus.new }
 
   describe '#byte_of' do
-    subject { status.byte_of(step: step).unpack("H*").first }
+    subject { status.byte_of(step: step) }
 
     context 'enable_player_light' do
       let(:step) { :enable_player_light }
@@ -106,7 +106,7 @@ describe SwitchConnectionManager::ProconInternalStatus do
       before do
         status.mark_as_send(step: step)
       end
-      it { expect(subject).to eq(["010000000000000000003001"].pack("H*")) }
+      it { expect(subject).to eq("010000000000000000003001") }
     end
 
     context '受信した後' do

@@ -7,7 +7,7 @@ class SwitchConnectionManager::ProconInternalStatus
     end
 
     def to_byte
-      [["01", "0", @counter, "00" * 8, @sub_command, @arg].join].pack("H*")
+      ["01", "0", @counter, "00" * 8, @sub_command, @arg].join
     end
   end
 
