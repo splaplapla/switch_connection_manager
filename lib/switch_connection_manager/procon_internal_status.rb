@@ -27,6 +27,56 @@ class SwitchConnectionManager::ProconInternalStatus
     end
   end
 
+  class CommandReceivedStatus
+    def initialize
+      @status = :init
+    end
+
+    def sent!(step: )
+      @status = :sent
+      @step = step
+    end
+
+    def received_ack!
+      @status = :received_ack
+    end
+
+    def received_ack?
+      @status == :received_ack
+    end
+
+    def init?
+      @status == :init
+    end
+
+    def step
+      @step
+    end
+  end
+
+  module Commander
+    def enable_player_light
+      HIDSubCommandRequest.new(counter: @counter, sub_command: "30", arg: "01").to_byte
+    end
+
+    def disable_player_light
+      HIDSubCommandRequest.new(counter: @counter, sub_command: "30", arg: "00").to_byte
+    end
+
+    def enable_home_button_light
+      HIDSubCommandRequest.new(counter: @counter, sub_command: "38", arg: "01").to_byte
+    end
+
+    def disable_home_button_light
+      HIDSubCommandRequest.new(counter: @counter, sub_command: "38", arg: "00").to_byte
+    end
+
+    def disable_vibration
+      HIDSubCommandRequest.new(counter: @counter, sub_command: "48", arg: "00").to_byte
+    end
+  end
+
+  include Commander
 
   attr_accessor :counter
   attr_accessor :player_light, :home_button_light
@@ -41,6 +91,11 @@ class SwitchConnectionManager::ProconInternalStatus
   SUB_COMMANDS_ON_START = [
     :enable_player_light,
     :enable_home_button_light,
+    :disable_vibration,
+  ]
+
+  SUB_COMMANDS_ON_END = [
+    :disable_home_button_light,
   ]
 
   SUB_COMMANDS_NAME_TABLE = {
@@ -55,37 +110,28 @@ class SwitchConnectionManager::ProconInternalStatus
     "38" => :home_button_light,
   }
 
-  SUB_COMMAND_STATUS_SENT = :sent
-  SUB_COMMAND_STATUS_RECEIVED_ACK = :received_ack
-
   def initialize
     @counter = 0
-    @send_sub_command_map = {}
+    @sub_command_received_status = CommandReceivedStatus.new
   end
 
   def byte_of(step: )
     public_send(step)
   end
 
+  def unreceived_byte
+    raise "使い方が違います" unless has_unreceived?
+    byte_of(step: @sub_command_received_status.step)
+  end
+
   def mark_as_send(step: )
     name = SUB_COMMANDS_NAME_TABLE[step]
-    @send_sub_command_map[name] = [SUB_COMMAND_STATUS_SENT]
+    @sub_command_received_status.sent!(step: step)
   end
 
-  def enable_player_light
-    HIDSubCommandRequest.new(counter: @counter, sub_command: "30", arg: "01").to_byte
-  end
-
-  def disable_player_light
-    HIDSubCommandRequest.new(counter: @counter, sub_command: "30", arg: "00").to_byte
-  end
-
-  def enable_home_button_light
-    HIDSubCommandRequest.new(counter: @counter, sub_command: "38", arg: "01").to_byte
-  end
-
-  def disable_home_button_light
-    HIDSubCommandRequest.new(counter: @counter, sub_command: "38", arg: "00").to_byte
+  def has_unreceived?
+    return false if @sub_command_received_status.init?
+    not @sub_command_received_status.received_ack?
   end
 
   def receive(raw_data: )
@@ -94,13 +140,13 @@ class SwitchConnectionManager::ProconInternalStatus
     when /^21/
       response = HIDSubCommandResponse.parse(data)
       step = SUB_COMMANDS_ID_TABLE[response.sub_command]
-      @send_sub_command_map[step] << SUB_COMMAND_STATUS_RECEIVED_ACK
+      @sub_command_received_status.received_ack!
     end
   end
 
   def received?(step: )
     name = SUB_COMMANDS_NAME_TABLE[step]
-    @send_sub_command_map[name]&.include?(SUB_COMMAND_STATUS_RECEIVED_ACK)
+    @sub_command_received_status.received_ack?
   end
 
   private

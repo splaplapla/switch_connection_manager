@@ -66,4 +66,56 @@ describe SwitchConnectionManager::ProconInternalStatus do
       end
     end
   end
+
+  describe '#has_unreceived?' do
+    let(:step) { :enable_player_light }
+
+    subject { status.has_unreceived? }
+
+    context '初期状態' do
+      it { expect(subject).to eq(false) }
+    end
+
+    context '送信直後' do
+      before do
+        status.mark_as_send(step: step)
+      end
+      it { expect(subject).to eq(true) }
+    end
+
+    context '受信した後' do
+      let(:raw_data) { ["2143810080007cb878903870098030"].pack("H*") }
+      before do
+        status.mark_as_send(step: step)
+        status.receive(raw_data: raw_data)
+      end
+      it { expect(subject).to eq(false) }
+    end
+  end
+
+  describe '#unreceived_byte' do
+    let(:step) { :enable_player_light }
+
+    subject { status.unreceived_byte }
+
+    context '初期状態' do
+      it { expect { subject }.to raise_error(RuntimeError) }
+    end
+
+    context '送信直後' do
+      before do
+        status.mark_as_send(step: step)
+      end
+      it { expect(subject).to eq(["010000000000000000003001"].pack("H*")) }
+    end
+
+    context '受信した後' do
+      let(:raw_data) { ["2143810080007cb878903870098030"].pack("H*") }
+      before do
+        status.mark_as_send(step: step)
+        status.receive(raw_data: raw_data)
+      end
+      it { expect { subject }.to raise_error(RuntimeError) }
+    end
+  end
 end
