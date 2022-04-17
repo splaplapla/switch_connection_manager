@@ -1,13 +1,13 @@
 class SwitchConnectionManager::ProconInternalStatus
   class HIDSubCommandRequest
     def initialize(counter: , sub_command: , arg: )
-      @counter = counter.to_s(16)
+      @counter = counter.to_s(16).rjust(2, "0")
       @sub_command = sub_command
       @arg = arg
     end
 
     def to_byte
-      ["01", "0", @counter, "00" * 8, @sub_command, @arg].join
+      ["01", @counter, "00" * 8, @sub_command, @arg].join
     end
   end
 
