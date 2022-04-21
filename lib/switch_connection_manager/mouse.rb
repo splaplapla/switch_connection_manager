@@ -8,7 +8,7 @@ class SwitchConnectionManager::Mouse
   private
 
   def blocking_read
-    raw_data = procon.read(64)
+    raw_data = mouse.read(64)
     to_stdout("<<< #{raw_data.unpack("H*").first}")
     return raw_data
   end
