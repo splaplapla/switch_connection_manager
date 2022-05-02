@@ -87,7 +87,6 @@ def connect!
     raw_data = blocking_read_with_timeout
     if(data = raw_data.unpack("H*").first) && !(data =~ /^21/)
       puts "想定外の値が返ってきたのでretryします"
-      sleep(1)
       raise InvalidProcotol
     end
   rescue InvalidProcotol
