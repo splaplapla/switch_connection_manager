@@ -66,7 +66,7 @@ end
 def drain_all
   write("8005")
   20.times do
-    non_blocking_read_with_timeout
+    non_blocking_read
   end
 end
 
