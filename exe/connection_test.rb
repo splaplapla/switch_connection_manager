@@ -53,7 +53,7 @@ def blocking_read_with_timeout
 end
 
 def non_blocking_read_with_timeout
-  timeout = Time.now + 4
+  timeout = Time.now + 1
 
   begin
     read_once
