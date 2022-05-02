@@ -111,8 +111,12 @@ def connect_with_recover!
   write("8002")
   blocking_read_with_timeout # <<< 8102
   write "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
-  raw_data = blocking_read_with_timeout # 21 or 8101
-  if(data = raw_data.unpack("H*").first) && !(data =~ /^21/)
+
+  raw_data = blocking_read_with_timeout
+  case(data = raw_data.unpack("H*").first)
+  when /^21/
+    write "8004"
+  when /^81/
     puts "(special route)"
     blocking_read_with_timeout # <<< 810100032dbd42e9b698000
     write("8002")
@@ -121,9 +125,8 @@ def connect_with_recover!
     blocking_read_with_timeout
     write "8004"
   else
-    write "8004"
+    raise "unkown patarren"
   end
-
 
   20.times do
     non_blocking_read_with_timeout
