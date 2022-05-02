@@ -63,6 +63,8 @@ def non_blocking_read_with_timeout
   end
 end
 
+class InvalidProcotol < StandardError; end
+
 def connect!
   begin
     write("0000")
@@ -78,8 +80,10 @@ def connect!
     if(data = raw_data.unpack("H*").first) && !(data =~ /^21/)
       puts "想定外の値が返ってきたのでretryします"
       sleep(1)
-      retry
+      raise InvalidProcotol
     end
+  rescue InvalidProcotol
+    retry
   end
 
   write "8004"
