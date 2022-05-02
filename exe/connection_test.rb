@@ -116,6 +116,8 @@ def connect_with_recover!
     puts "(special route)"
     blocking_read_with_timeout
     write "8004"
+  else
+    write "8004"
   end
 
 
