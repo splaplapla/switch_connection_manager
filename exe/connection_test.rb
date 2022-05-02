@@ -73,7 +73,7 @@ end
 
 class InvalidProcotol < StandardError; end
 
-def connect!
+def connect_with_retry!
   begin
     write("0000")
     write("0000")
@@ -101,6 +101,8 @@ def connect!
   end
 end
 
-connect!
+connect_with_retry!
+
+
 drain_all
 exit
