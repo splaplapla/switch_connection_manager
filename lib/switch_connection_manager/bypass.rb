@@ -1,0 +1,2 @@
+class SwitchConnectionManager::Bypass
+end
