@@ -66,8 +66,9 @@ end
 def drain_all
   write("8005")
   20.times do
-    non_blocking_read
+    non_blocking_read_with_timeout
   end
+rescue ReadTimeoutError
 end
 
 class InvalidProcotol < StandardError; end
