@@ -118,6 +118,8 @@ def connect_with_recover!
     write("8002")
     blocking_read_with_timeout
     write "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
+    blocking_read_with_timeout
+    write "8004"
   else
     write "8004"
   end
