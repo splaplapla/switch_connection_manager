@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require "timeout"
 require 'bundler/inline'
 require "bundler/setup"
 require "switch_connection_manager"
