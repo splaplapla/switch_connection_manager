@@ -63,6 +63,13 @@ def non_blocking_read_with_timeout
   end
 end
 
+def drain_all
+  write("8005")
+  20.times do
+    non_blocking_read_with_timeout
+  end
+end
+
 class InvalidProcotol < StandardError; end
 
 def connect!
@@ -83,16 +90,17 @@ def connect!
       raise InvalidProcotol
     end
   rescue InvalidProcotol
+    drain_all
     retry
   end
 
   write "8004"
 
-  50.times do
+  20.times do
     non_blocking_read_with_timeout
   end
 end
 
 connect!
-
+drain_all
 exit
