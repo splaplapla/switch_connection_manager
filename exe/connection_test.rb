@@ -101,7 +101,31 @@ def connect_with_retry!
   end
 end
 
-connect_with_retry!
+def connect_with_recover!
+  write("0000")
+  write("0000")
+  write("8005")
+  write("0000")
+  write("8001")
+  blocking_read_with_timeout
+  write("8002")
+  blocking_read_with_timeout
+  write "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
+  raw_data = blocking_read_with_timeout
+  if(data = raw_data.unpack("H*").first) && !(data =~ /^21/)
+    write "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
+    blocking_read_with_timeout
+  end
+
+  write "8004"
+
+  20.times do
+    non_blocking_read_with_timeout
+  end
+end
+
+
+connect_with_recover!
 
 
 drain_all
