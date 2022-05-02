@@ -43,6 +43,14 @@ def read_once
   return raw_data
 end
 
+def blocking_read_with_timeout
+  Timeout.timeout(4) do
+    raw_data = procon.read(64)
+    puts("<<< #{raw_data.unpack("H*").first}")
+    return raw_data
+  end
+end
+
 def non_blocking_read_with_timeout
   timeout = Time.now + 4
 
@@ -61,8 +69,11 @@ write("8005")
 write("0000")
 write("8001")
 write "010e00000000000000004001"
+blocking_read_with_timeout
 write "010000000000000000000330"
+blocking_read_with_timeout
 write "010200000000000000003801"
+blocking_read_with_timeout
 write "8004"
 
 199.times do
