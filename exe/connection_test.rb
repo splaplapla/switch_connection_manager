@@ -114,8 +114,10 @@ def connect_with_recover!
   raw_data = blocking_read_with_timeout
   if(data = raw_data.unpack("H*").first) && !(data =~ /^21/)
     puts "(special route)"
+    blocking_read_with_timeout # <<< 810100032dbd42e9b698000
+    write("8002")
     blocking_read_with_timeout
-    write "8004"
+    write "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
   else
     write "8004"
   end
