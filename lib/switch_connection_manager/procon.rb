@@ -1,9 +1,7 @@
 # 対プロコンに接続してボタンなどの入力を読み取る
 class SwitchConnectionManager::Procon
-  class AlreadyConnectedError < StandardError; end
   class ReadTimeoutError < StandardError; end
   # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
-  # TODO 切断したらstatusをdisconnectedにする
   # TODO switchと接続していない状態でもジャイロを動くようにする
 
   CONFIGURATION_STEPS = [
