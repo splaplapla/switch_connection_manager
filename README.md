@@ -53,3 +53,7 @@ The gem is available as open source under the terms of the [MIT License](https:/
 * usb gadgetをresetしてからすぐにavailableになる時と、数秒開けないとavailableにならない時がある.
   * readとかすれば状態を認知できて適切なインターバルがわかるかも
   * resetしてからインターバルが長すぎると接続できない？
+* プロコン, Switchのそれぞれと接続するクラスを作る
+  - [ ] これらができたら繋げてバイパスをする
+  - [ ] procon, switch_simulatorを動かしてどこまで作ったのかを思い出す
+  - [ ] proconを動かす場合は、未接続の時にちゃんとジャイロを送信することを動作確認をすること
