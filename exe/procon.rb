@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+#
+# プロコンに接続するコマンド
 
 require 'bundler/inline'
 require "bundler/setup"

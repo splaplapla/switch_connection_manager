@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-# プロコンのみの接続テスト用最低限のスクリプト
+#
+# プロコンのみの接続テスト用最低限のコマンド
 # * Switchとbluetoothで接続ができている状態で使う
 # frozen_string_literal: true
 
