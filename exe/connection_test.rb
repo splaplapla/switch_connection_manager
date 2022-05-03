@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# プロコンのみの接続テスト
 # frozen_string_literal: true
 
 require "timeout"
