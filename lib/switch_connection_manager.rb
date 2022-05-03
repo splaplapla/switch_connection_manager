@@ -11,6 +11,4 @@ require_relative "switch_connection_manager/mouse_finder"
 require_relative "switch_connection_manager/procon_internal_status"
 
 module SwitchConnectionManager
-  class Error < StandardError; end
-  # Your code goes here...
 end

@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-# プロコンのみの接続テスト
+# プロコンのみの接続テスト用最低限のスクリプト
+# * Switchとbluetoothで接続ができている状態で使う
 # frozen_string_literal: true
 
 require "timeout"
