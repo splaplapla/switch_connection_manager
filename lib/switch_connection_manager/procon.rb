@@ -1,4 +1,4 @@
-# 対プロコンに対して使う用です
+# 対プロコンに接続してボタンなどの入力を読み取る
 class SwitchConnectionManager::Procon
   class AlreadyConnectedError < StandardError; end
   class ReadTimeoutError < StandardError; end

@@ -1,3 +1,5 @@
+# Switchに対してProconとして振る舞うクラス
+# * 接続プロトコルをシュミレートする
 class SwitchConnectionManager::ProconSimulator
   attr_accessor :gadget, :procon
 
@@ -167,4 +169,3 @@ class SwitchConnectionManager::ProconSimulator
     puts(text)
   end
 end
-
