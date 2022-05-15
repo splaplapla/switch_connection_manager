@@ -120,9 +120,10 @@ def connect_with_recover!
   when /^21/
     write "8004"
 
-    write "010200000000000000003801"
-    write "010200000000000000003803"
-    write "010200000000000000003809"
+    write "0102000000000000000038F1F"
+    write "0103000000000000000038F1F"
+    write "0104000000000000000038F1F"
+    write "0105000000000000000038F1F"
   when /^81/
     puts "(special route)"
     blocking_read_with_timeout # <<< 810100032dbd42e9b698000
@@ -132,9 +133,10 @@ def connect_with_recover!
     blocking_read_with_timeout
     write "8004"
 
-    write "010200000000000000003801"
-    write "010200000000000000003803"
-    write "010200000000000000003809"
+    write "0102000000000000000038F1F"
+    write "0103000000000000000038F1F"
+    write "0104000000000000000038F1F"
+    write "0105000000000000000038F1F"
   else
     raise "unkown patarren"
   end
