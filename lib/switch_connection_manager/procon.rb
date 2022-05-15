@@ -20,7 +20,7 @@ class SwitchConnectionManager::Procon
     # "010e00000000000000004001", # 01-40. 01-03-30で有効化するので不要
     # "010000000000000000004800", # vibration
     # "0101000000000000000030f0", # led
-    "010200000000000000003801", # home button led
+    # "010200000000000000003801", # home button led
   ]
 
   attr_accessor :procon

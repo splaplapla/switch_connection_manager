@@ -93,9 +93,9 @@ class SwitchConnectionManager::ProconInternalStatus
   ]
 
   SUB_COMMANDS_ON_START = [
-    # :enable_player_light,
     :disable_vibration,
     :enable_home_button_light,
+    :enable_player_light,
   ]
 
   SUB_COMMANDS_ON_END = [
