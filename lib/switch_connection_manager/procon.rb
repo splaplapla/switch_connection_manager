@@ -31,10 +31,10 @@ class SwitchConnectionManager::Procon
     @connected_step_index = 0
     @configuration_steps = []
     @internal_status = SwitchConnectionManager::ProconInternalStatus.new
-    1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
-    # SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
-    #   @configuration_steps << step
-    # end
+    # 1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } } # もう動かない
+    SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
+      @configuration_steps << step
+    end
   end
 
   def run
