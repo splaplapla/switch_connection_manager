@@ -118,11 +118,11 @@ def connect_with_recover!
   raw_data = blocking_read_with_timeout
   case(data = raw_data.unpack("H*").first)
   when /^21/
+    write "8004"
+
     write "010200000000000000003801"
     write "010200000000000000003803"
-    write "010200000000000000003805"
-
-    write "8004"
+    write "010200000000000000003809"
   when /^81/
     puts "(special route)"
     blocking_read_with_timeout # <<< 810100032dbd42e9b698000
@@ -130,12 +130,11 @@ def connect_with_recover!
     blocking_read_with_timeout
     write "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
     blocking_read_with_timeout
+    write "8004"
 
     write "010200000000000000003801"
     write "010200000000000000003803"
-    write "010200000000000000003805"
-
-    write "8004"
+    write "010200000000000000003809"
   else
     raise "unkown patarren"
   end
