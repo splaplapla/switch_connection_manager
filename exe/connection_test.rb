@@ -134,7 +134,7 @@ def connect_with_recover!
     blocking_read_with_timeout
     write "8004"
 
-    write "0105000000000000000038F1F"
+    write home_eld
   else
     raise "unkown patarren"
   end
