@@ -104,6 +104,10 @@ def connect_with_retry!
   end
 end
 
+def home_eld
+  "01020000000000000000381FF0FF"
+end
+
 def connect_with_recover!
   write("0000")
   write("0000")
@@ -120,10 +124,7 @@ def connect_with_recover!
   when /^21/
     write "8004"
 
-    write "0102000000000000000038F1F"
-    write "0103000000000000000038F1F"
-    write "0104000000000000000038F1F"
-    write "0105000000000000000038F1F"
+    write home_eld
   when /^81/
     puts "(special route)"
     blocking_read_with_timeout # <<< 810100032dbd42e9b698000
@@ -133,9 +134,6 @@ def connect_with_recover!
     blocking_read_with_timeout
     write "8004"
 
-    write "0102000000000000000038F1F"
-    write "0103000000000000000038F1F"
-    write "0104000000000000000038F1F"
     write "0105000000000000000038F1F"
   else
     raise "unkown patarren"
