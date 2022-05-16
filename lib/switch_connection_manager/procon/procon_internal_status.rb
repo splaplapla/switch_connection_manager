@@ -89,7 +89,7 @@ class SwitchConnectionManager::ProconInternalStatus
     # "18", # SPI read. not support
     # "12",
     ["30", "01"], # player_light
-    ["38", "01"], # home_button_light
+    ["38", "F1F"], # home_button_light
   ]
 
   SUB_COMMANDS_ON_START = [
