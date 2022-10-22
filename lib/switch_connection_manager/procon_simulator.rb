@@ -1,5 +1,7 @@
+require "switch_connection_manager/usb_device_controller"
+
 class SwitchConnectionManager::ProconSimulator
-  attr_accessor :gadget, :procon
+  attr_accessor :gadget
 
   MAC_ADDR = '00005e00535e'
 
