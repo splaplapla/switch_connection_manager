@@ -18,7 +18,11 @@ class SwitchConnectionManager::ProconSimulator
 
     loop do
       if is_started_procon_simulator_thread?
-        sleep(5)
+        if(interval_after_connected = ENV["INTERVAL_AFTER_CONNECTED"])
+          sleep(interval_after_connected)
+        else
+          sleep(5)
+        end
         read_once
       else
         read_once
