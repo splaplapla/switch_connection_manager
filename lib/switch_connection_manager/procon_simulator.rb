@@ -17,7 +17,11 @@ class SwitchConnectionManager::ProconSimulator
     init_devices
 
     loop do
-      read_once
+      if is_started_procon_simulator_thread?
+        sleep(5)
+      else
+        read_once
+      end
     end
   end
 
@@ -160,6 +164,10 @@ class SwitchConnectionManager::ProconSimulator
           retry
         end
       end
+  end
+
+  def is_started_procon_simulator_thread?
+    !!@procon_simulator_thread
   end
 
   def init_devices
