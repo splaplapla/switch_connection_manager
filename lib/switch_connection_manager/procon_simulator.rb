@@ -19,6 +19,7 @@ class SwitchConnectionManager::ProconSimulator
     loop do
       if is_started_procon_simulator_thread?
         sleep(5)
+        read_once
       else
         read_once
       end
