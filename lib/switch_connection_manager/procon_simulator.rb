@@ -30,7 +30,6 @@ class SwitchConnectionManager::ProconSimulator
     case first_data_part
     when "00", "80"
       data = raw_data.unpack("H*").first
-      to_stdout(">>> #{data}")
       case data
       when "0000", "8005"
         return nil
@@ -94,7 +93,9 @@ class SwitchConnectionManager::ProconSimulator
   private
 
   def read
-    gadget.read_nonblock(64)
+    data = gadget.read_nonblock(64)
+    to_stdout(">>> #{data.unpack("H*").first}")
+    return data
   rescue IO::EAGAINWaitReadable
     retry
   end
