@@ -120,7 +120,7 @@ class SwitchConnectionManager::ProconSimulator
 
   def input_response
     response(
-      make_response("30", response_counter, "810080007cc8788f28700a78fd0d00f90ff5ff0100080075fd0900f70ff5ff0200070071fd0900f70ff5ff02000700000000000000000000000000000000")
+      make_response("30", response_counter, "9810080007cc8788f28700a78fd0d00f90ff5ff0100080075fd0900f70ff5ff0200070071fd0900f70ff5ff02000700000000000000000000000000000000")
     )
   end
 
