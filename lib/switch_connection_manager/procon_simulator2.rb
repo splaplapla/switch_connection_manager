@@ -28,8 +28,6 @@ class SwitchConnectionManager::ProconSimulator2
 
     case first_data_part
     when "00", "80"
-      debug_log("  first part is 00 or 80")
-
       data = raw_data.unpack("H*").first
       case data
       when "0000", "8005"
@@ -49,12 +47,9 @@ class SwitchConnectionManager::ProconSimulator2
         puts "#{raw_data.unpack("H*").first} is unknown!!!!!!(1)"
       end
     when "01"
-      debug_log("  first part is 01")
       sub_command = raw_data[10].unpack("H*").first
-
       case sub_command
       when "01" # Bluetooth manual pairing
-        debug_log("    sub command part is 01")
         uart_response("81", sub_command, "03")
       when "02" # Request device info
         uart_response("82", sub_command, "03480302#{MAC_ADDR.reverse}0301")
