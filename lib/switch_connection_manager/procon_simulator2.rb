@@ -173,6 +173,6 @@ class SwitchConnectionManager::ProconSimulator2
   end
 
   def debug_log(text)
-    puts("[debug] #{text}") if ENV["VERBOSE"}
+    puts("[debug] #{text}") if ENV["VERBOSE"]
   end
 end
