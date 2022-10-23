@@ -40,8 +40,6 @@ class SwitchConnectionManager::ProconSimulator2
         )
       when "8002"
         response("8102")
-        response("01000000000000000000033")
-        response("21e791008000a7577240f8740b8003")
       when "8004"
         start_procon_simulator_thread
         return nil
