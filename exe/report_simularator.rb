@@ -39,7 +39,6 @@ def read_once(data)
     when "02" # Request device info
       uart_response("82", sub_command, "03480302#{MAC_ADDR.reverse}0301")
     when "03", "08", "30", "38", "40", "48" # 01-03, 01-8, 01-30, 01-38, 01-40, 01-48
-      binding.pry
       uart_response("80", sub_command, [])
     when "04" # Trigger buttons elapsed time
       uart_response("83", sub_command, [])
