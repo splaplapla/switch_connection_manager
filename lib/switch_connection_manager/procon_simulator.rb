@@ -42,6 +42,8 @@ class SwitchConnectionManager::ProconSimulator
         response(
           make_response("81", "02", [])
         )
+        response("01000000000000000000033")
+        response("21e791008000a7577240f8740b8003")
       when "8004"
         start_procon_simulator_thread
         return nil
