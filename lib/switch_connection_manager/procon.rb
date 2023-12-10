@@ -25,8 +25,6 @@ class SwitchConnectionManager::Procon
 
   def initialize
     @status = SwitchConnectionManager::ProconConnectionStatus.new
-    @input_report_receiver_thread = nil
-    @connected_step_index = 0
     @configuration_steps = []
     @internal_status = SwitchConnectionManager::ProconInternalStatus.new
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
@@ -76,7 +74,6 @@ class SwitchConnectionManager::Procon
       when /^8102/
         return send_to_procon "010100000000000000000330"
       when /^21.+?8003000/
-
         loop do
           if @internal_status.has_unreceived_command?
             send_to_procon(@internal_status.unreceived_byte)
@@ -183,16 +180,15 @@ class SwitchConnectionManager::Procon
 
   def start_input_report_receiver_thread
     sleep(0.5)
-    @input_report_receiver_thread =
-      Thread.start do
-        break if $terminated
-        loop do
-          begin
-            raw_data = non_blocking_read_with_timeout
-          rescue ReadTimeoutError
-            print "."
-          end
+    Thread.start do
+      break if $terminated
+      loop do
+        begin
+          raw_data = non_blocking_read_with_timeout
+        rescue ReadTimeoutError
+          print "."
         end
       end
+    end
   end
 end
