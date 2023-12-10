@@ -1,5 +1,5 @@
 # 対プロコンに接続してボタンなどの入力を読み取る
-class SwitchConnectionManager::Procon
+class SwitchConnectionManager::OldProcon
   class ReadTimeoutError < StandardError; end
 
   CONFIGURATION_STEPS = [
