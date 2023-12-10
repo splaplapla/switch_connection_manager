@@ -1,5 +1,3 @@
-require "switch_connection_manager/usb_device_controller"
-
 class SwitchConnectionManager::ProconSimulator2
   attr_accessor :gadget
 
