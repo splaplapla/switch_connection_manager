@@ -1,9 +1,7 @@
-# 対プロコンに対して使う用です
+# 対プロコンに接続してボタンなどの入力を読み取る
 class SwitchConnectionManager::Procon
-  class AlreadyConnectedError < StandardError; end
   class ReadTimeoutError < StandardError; end
   # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
-  # TODO 切断したらstatusをdisconnectedにする
   # TODO switchと接続していない状態でもジャイロを動くようにする
 
   CONFIGURATION_STEPS = [
@@ -33,7 +31,7 @@ class SwitchConnectionManager::Procon
     @connected_step_index = 0
     @configuration_steps = []
     @internal_status = SwitchConnectionManager::ProconInternalStatus.new
-    # 1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } }
+    # 1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } } # もう動かない
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
       @configuration_steps << step
     end

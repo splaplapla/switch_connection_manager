@@ -1,5 +1,5 @@
-require "switch_connection_manager/usb_device_controller"
-
+# Switchに対してProconとして振る舞うクラス
+# * 接続プロトコルをシュミレートする
 class SwitchConnectionManager::ProconSimulator
   attr_accessor :gadget
 
@@ -176,4 +176,3 @@ class SwitchConnectionManager::ProconSimulator
     puts(text)
   end
 end
-

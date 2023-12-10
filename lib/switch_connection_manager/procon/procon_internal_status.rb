@@ -68,7 +68,7 @@ class SwitchConnectionManager::ProconInternalStatus
     end
 
     def enable_home_button_light
-      HIDSubCommandRequest.new(counter: @counter, sub_command: "38", arg: "01").to_byte
+      HIDSubCommandRequest.new(counter: @counter, sub_command: "38", arg: "1FF0FF").to_byte
     end
 
     def disable_home_button_light
@@ -89,7 +89,7 @@ class SwitchConnectionManager::ProconInternalStatus
     # "18", # SPI read. not support
     # "12",
     ["30", "01"], # player_light
-    ["38", "01"], # home_button_light
+    ["38", "1FF0FF"], # home_button_light
   ]
 
   SUB_COMMANDS_ON_START = [

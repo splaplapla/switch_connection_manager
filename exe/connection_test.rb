@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-# プロコンのみの接続テスト用最低限のスクリプト
+#
+# プロコンのみの接続テスト用最低限のコマンド
 # * Switchとbluetoothで接続ができている状態で使う
 # frozen_string_literal: true
 
@@ -103,6 +104,10 @@ def connect_with_retry!
   end
 end
 
+def home_eld
+  "01020000000000000000381FF0FF"
+end
+
 def connect_with_recover!
   write("0000")
   write("0000")
@@ -118,6 +123,8 @@ def connect_with_recover!
   case(data = raw_data.unpack("H*").first)
   when /^21/
     write "8004"
+
+    write home_eld
   when /^81/
     puts "(special route)"
     blocking_read_with_timeout # <<< 810100032dbd42e9b698000
@@ -126,6 +133,8 @@ def connect_with_recover!
     write "01000000000000000000033000000000000000000000000000000000000000000000000000000000000000000000000000"
     blocking_read_with_timeout
     write "8004"
+
+    write home_eld
   else
     raise "unkown patarren"
   end
