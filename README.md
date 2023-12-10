@@ -25,6 +25,10 @@ TODO: Write usage instructions here
 
 * `sudo /home/pi/.rbenv/shims/ruby exe/procon.rb`
 
+#### 開発用コマンド
+* exe/procon.rb
+  * ラズパイに繋がっているコントローラーとだけ接続して、ジャイロを含んだアウトプットをする
+
 ## 接続プロトコル(プロコンがデータを送信するようになるまで)
 
 ```mermaid

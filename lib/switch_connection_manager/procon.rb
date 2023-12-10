@@ -1,8 +1,6 @@
 # 対プロコンに接続してボタンなどの入力を読み取る
 class SwitchConnectionManager::Procon
   class ReadTimeoutError < StandardError; end
-  # NOTE 現時点では、bluetoothでつながっている状態で実行するとジャイロも動くようになる
-  # TODO switchと接続していない状態でもジャイロを動くようにする
 
   CONFIGURATION_STEPS = [
     "01000000000000000000480000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-48
@@ -31,14 +29,13 @@ class SwitchConnectionManager::Procon
     @connected_step_index = 0
     @configuration_steps = []
     @internal_status = SwitchConnectionManager::ProconInternalStatus.new
-    # 1.times { CONFIGURATION_STEPS.each { |x| @configuration_steps << x } } # もう動かない
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
       @configuration_steps << step
     end
   end
 
   def run
-    init_devices
+    @procon = find_procon_device
 
     at_exit do
       $terminated = true
@@ -112,8 +109,7 @@ class SwitchConnectionManager::Procon
     connection_sleep
   rescue ReadTimeoutError
     @status.reset!
-    puts('テストコマンドを送信します')
-    send_to_procon("8006")
+    send_to_procon("8006") # タイムアウトをしたらこれでリセットが必要
     retry
   end
 
@@ -143,10 +139,11 @@ class SwitchConnectionManager::Procon
     retry
   end
 
-  def init_devices
+  # @return [File]
+  def find_procon_device
     if path = SwitchConnectionManager::DeviceProconFinder.find
-      @procon = File.open(path, "w+b")
       puts "Use #{path} as procon's device file"
+      return File.open(path, "w+b")
     else
       raise "not found procon error" # TODO erro class
     end
@@ -156,28 +153,22 @@ class SwitchConnectionManager::Procon
     puts(text)
   end
 
-  # @raise [IO::EAGAINWaitReadable]
-  def read_once
-    raw_data = procon.read_nonblock(64)
-    to_stdout("<<< #{raw_data.unpack("H*").first}")
-    return raw_data
-  end
-
-  def non_blocking_read
-    read_once
-  rescue IO::EAGAINWaitReadable
-    retry
-  end
-
   def non_blocking_read_with_timeout
     timeout = Time.now + 1
 
     begin
-      read_once
+      non_blocking_read
     rescue IO::EAGAINWaitReadable
       raise(ReadTimeoutError) if timeout < Time.now
       retry
     end
+  end
+
+  # @raise [IO::EAGAINWaitReadable]
+  def non_blocking_read
+    raw_data = procon.read_nonblock(64)
+    to_stdout("<<< #{raw_data.unpack("H*").first}")
+    return raw_data
   end
 
   def blocking_read
