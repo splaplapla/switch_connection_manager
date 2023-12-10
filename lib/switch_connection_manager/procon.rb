@@ -112,7 +112,8 @@ class SwitchConnectionManager::Procon
     connection_sleep
   rescue ReadTimeoutError
     @status.reset!
-    send_to_procon("8004")
+    puts('テストコマンドを送信します')
+    send_to_procon("8006")
     retry
   end
 
