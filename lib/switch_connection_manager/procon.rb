@@ -30,10 +30,6 @@ class SwitchConnectionManager::Procon
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
       @configuration_steps << step
     end
-  end
-
-  def run
-    @procon = find_procon_device
 
     at_exit do
       $terminated = true
@@ -51,6 +47,10 @@ class SwitchConnectionManager::Procon
         procon.close
       end
     end
+  end
+
+  def run
+    @procon = find_procon_device
 
     loop do
       do_once
