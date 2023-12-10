@@ -20,6 +20,10 @@ And then execute:
 
 TODO: Write usage instructions here
 
+### 開発用の動作確認方法
+デバイスファイルがroot所有になっているのでsudoが必要
+
+* `sudo /home/pi/.rbenv/shims/ruby exe/procon.rb`
 
 ## 接続プロトコル(プロコンがデータを送信するようになるまで)
 

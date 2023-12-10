@@ -112,6 +112,7 @@ class SwitchConnectionManager::Procon
     connection_sleep
   rescue ReadTimeoutError
     @status.reset!
+    send_to_procon("8004")
     retry
   end
 
