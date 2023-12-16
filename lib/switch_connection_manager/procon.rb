@@ -125,9 +125,10 @@ class SwitchConnectionManager::Procon
 
   # @return [File]
   def find_procon_device
-    raise ProconNotFound, 'not found procon error' unless path = SwitchConnectionManager::DeviceProconFinder.find
+    raise ProconNotFound, 'not found procon error' unless(path = SwitchConnectionManager::DeviceProconFinder.find)
 
     puts "Use #{path} as procon's device file"
+    `sudo chmod 777 #{path}`
     File.open(path, 'w+b')
 
     # TODO: erro class
