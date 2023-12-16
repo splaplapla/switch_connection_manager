@@ -12,15 +12,25 @@ require 'switch_connection_manager'
 procon = SwitchConnectionManager::Procon.new
 procon.prepare!
 
-shutdown_block = lambda {|_|
-  procon.shutdown
-  exit
-}
+self_read, self_write = IO.pipe
+%w[TERM INT QUIT].each do |sig|
+  trap sig do
+    self_write.puts(sig)
+  end
+end
 
-Signal.trap(:INT, &shutdown_block)
-Signal.trap(:TERM, &shutdown_block)
+Thread.new do
+  procon.read_and_print # ブロッキングする
+end
 
-procon.read_and_print # ブロッキングする
+while (readable_io = IO.select([self_read]))
+  signal = readable_io.first[0].gets.strip
+  case signal
+  when 'TERM', 'INT', 'QUIT'
+    procon.shutdown
+    exit
+  end
+end
 
 # NOTE: ライブラリとして呼び出す時は以下のメソッドを適宜呼び出す
 # @example procon#device、 Fileインスタンスを返す
