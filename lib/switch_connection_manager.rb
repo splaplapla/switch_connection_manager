@@ -13,4 +13,11 @@ require "switch_connection_manager/support/procon_finder"
 require "switch_connection_manager/support/usb_device_controller"
 
 module SwitchConnectionManager
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
+  end
+
+  def self.logger=(logger)
+    @logger = logger
+  end
 end

@@ -43,6 +43,7 @@ class SwitchConnectionManager::Procon
 
   def shutdown
     return unless procon
+    SwitchConnectionManager.logger.info('Shutdown procon')
 
     @terminated = true
 
@@ -60,6 +61,8 @@ class SwitchConnectionManager::Procon
       # no-op
     end
     procon.close
+
+    SwitchConnectionManager.logger.info('Shutdown procon finished')
   end
 
   private
