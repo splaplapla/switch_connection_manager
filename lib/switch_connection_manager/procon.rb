@@ -121,7 +121,7 @@ class SwitchConnectionManager::Procon
   rescue IO::EAGAINWaitReadable
     retry
   rescue Errno::EINVAL => e
-    puts e.message
+    SwitchConnectionManager.logger.error e.message
     sleep(1)
     retry
   end
@@ -130,7 +130,7 @@ class SwitchConnectionManager::Procon
   def find_procon_device
     raise ProconNotFound, 'not found procon error' unless(path = SwitchConnectionManager::DeviceProconFinder.find)
 
-    puts "Use #{path} as procon's device file"
+    SwitchConnectionManager.logger.info "Use #{path} as procon's device file"
     `sudo chmod 777 #{path}`
     File.open(path, 'w+b')
 
@@ -138,7 +138,7 @@ class SwitchConnectionManager::Procon
   end
 
   def to_stdout(text)
-    puts(text)
+    SwitchConnectionManager.logger.debug(text)
   end
 
   def non_blocking_read_with_timeout
