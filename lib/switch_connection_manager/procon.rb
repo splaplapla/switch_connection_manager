@@ -8,7 +8,7 @@ class SwitchConnectionManager::Procon
   def initialize
     @procon_connection_status = SwitchConnectionManager::ProconConnectionStatus.new
     @configuration_steps = []
-    @internal_status = SwitchConnectionManager::ProconInternalStatus.new
+    @prebypass_connection_status = SwitchConnectionManager::ProconInternalStatus.new
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
       @configuration_steps << step
     end
@@ -76,18 +76,18 @@ class SwitchConnectionManager::Procon
         return
       when /^21.+?8003000/
         loop do
-          if @internal_status.has_unreceived_command?
-            send_to_procon(@internal_status.unreceived_byte)
+          if @prebypass_connection_status.has_unreceived_command?
+            send_to_procon(@prebypass_connection_status.unreceived_byte)
           else
             break unless (configuration_step = @configuration_steps.shift)
 
-            @internal_status.mark_as_send(step: configuration_step)
-            send_to_procon(@internal_status.byte_of(step: configuration_step))
+            @prebypass_connection_status.mark_as_send(step: configuration_step)
+            send_to_procon(@prebypass_connection_status.byte_of(step: configuration_step))
           end
 
           begin
             raw_data = non_blocking_read_with_timeout
-            @internal_status.receive(raw_data:)
+            @prebypass_connection_status.receive(raw_data:)
           rescue ReadTimeoutError
             print '.'
           end
