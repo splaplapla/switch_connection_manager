@@ -138,7 +138,9 @@ class SwitchConnectionManager::ProconSimulator2
   end
 
   def gadget
-    @gadget ||= File.open('/dev/hidg0', "w+b")
+    path = '/dev/hidg0'
+    `sudo chmod 777 #{path}`
+    @gadget ||= File.open(path, "w+b")
   end
 
   def start_procon_simulator_thread
