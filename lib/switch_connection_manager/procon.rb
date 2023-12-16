@@ -54,6 +54,14 @@ class SwitchConnectionManager::Procon
     end
     send_to_procon('8005')
     send_to_procon('010200000000000000003800') # off home bottun led
+
+    send_to_procon("010500000000000000003800")
+    send_to_procon("010600000000000000003800")
+    send_to_procon("010700000000000000003800")
+    send_to_procon("010800000000000000003800")
+    send_to_procon("8005")
+    send_to_procon("8005")
+    send_to_procon("8005")
     # 未送信のデータを吐き出す。いらないかも
     4.times do
       non_blocking_read_with_timeout
