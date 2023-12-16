@@ -12,8 +12,16 @@ class SwitchConnectionManager::Procon
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
       @configuration_steps << step
     end
+  end
 
-    prepare!
+  # @return [void]
+  def prepare!
+    @procon = find_procon_device
+
+    loop do
+      is_finished = do_once
+      break if is_finished
+    end
   end
 
   # @return [void] ブロッキングする
@@ -70,10 +78,10 @@ class SwitchConnectionManager::Procon
       case data
       when /^8101/ # 810100032dbd42e9b69800 的なやつがくる
         send_to_procon '8002'
-        return
+        nil
       when /^8102/
         send_to_procon '010100000000000000000330'
-        return
+        nil
       when /^21.+?8003000/
         loop do
           if @prebypass_connection_status.has_unreceived_command?
@@ -95,25 +103,13 @@ class SwitchConnectionManager::Procon
 
         send_to_procon '8004'
         @procon_connection_status.connected!
-        return true
-      else
-        return
+        true
       end
     end
   rescue ReadTimeoutError
     @procon_connection_status.reset!
     send_to_procon('8006') # タイムアウトをしたらこれでリセットが必要
     retry
-  end
-
-  # @return [void]
-  def prepare!
-    @procon = find_procon_device
-
-    loop do
-      is_finished = do_once
-      break if is_finished
-    end
   end
 
   def write(data)
