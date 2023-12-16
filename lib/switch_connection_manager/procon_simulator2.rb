@@ -152,6 +152,9 @@ class SwitchConnectionManager::ProconSimulator2
   def init_devices
     SwitchConnectionManager::UsbDeviceController.reset
     SwitchConnectionManager::UsbDeviceController.init
+
+    system('sudo chmod 777 -R /sys/kernel/config/usb_gadget/procon')
+    system('sudo chmod 777 /dev/hidg0')
     @gadget = File.open('/dev/hidg0', "w+b")
   end
 
