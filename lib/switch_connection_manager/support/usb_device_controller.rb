@@ -46,6 +46,7 @@ class SwitchConnectionManager::UsbDeviceController
 
       `bash -c '#{shell}'`
 
+      sleep 1
       system('sudo chmod 777 -R /sys/kernel/config/usb_gadget/procon')
       system('sudo chmod 777 /dev/hidg0')
     end
