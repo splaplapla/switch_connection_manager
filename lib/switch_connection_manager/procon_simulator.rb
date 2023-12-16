@@ -146,12 +146,6 @@ class SwitchConnectionManager::ProconSimulator
     retry
   end
 
-  def gadget
-    path = '/dev/hidg0'
-    `sudo chmod 777 #{path}`
-    @gadget ||= File.open(path, "w+b")
-  end
-
   def start_procon_simulator_thread
     @procon_simulator_thread =
       Thread.start do
@@ -171,7 +165,7 @@ class SwitchConnectionManager::ProconSimulator
   def init_devices
     SwitchConnectionManager::UsbDeviceController.reset
     SwitchConnectionManager::UsbDeviceController.init
-    @gadget = File.open('/dev/hidg0', "w+b")
+    @gadget = File.open(path, "w+b")
   end
 
   def to_stdout(text)

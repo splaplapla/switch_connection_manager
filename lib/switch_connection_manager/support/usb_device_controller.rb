@@ -3,6 +3,7 @@ class SwitchConnectionManager::UsbDeviceController
     def reset
       system('echo > /sys/kernel/config/usb_gadget/procon/UDC')
       system('ls /sys/class/udc > /sys/kernel/config/usb_gadget/procon/UDC')
+      system('sudo chmod 777 -R /sys/kernel/config/usb_gadget/procon')
       sleep 0.5
     end
 
@@ -44,6 +45,9 @@ class SwitchConnectionManager::UsbDeviceController
       EOH
 
       `bash -c '#{shell}'`
+
+      system('sudo chmod 777 -R /sys/kernel/config/usb_gadget/procon')
+      system('sudo chmod 777 /dev/hidg0')
     end
 
     def initialized?
