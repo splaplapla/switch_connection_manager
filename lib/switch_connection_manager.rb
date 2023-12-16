@@ -3,7 +3,6 @@
 require "switch_connection_manager/version"
 require "switch_connection_manager/procon_simulator"
 require "switch_connection_manager/procon_simulator2"
-require "switch_connection_manager/procon_procon"
 require "switch_connection_manager/procon"
 require "switch_connection_manager/old_procon"
 require "switch_connection_manager/mouse"

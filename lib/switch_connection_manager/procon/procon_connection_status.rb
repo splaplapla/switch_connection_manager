@@ -19,16 +19,16 @@ class SwitchConnectionManager::ProconConnectionStatus
 
   def sent_initialize_data!
     @value = :sent_initialize_data
-    puts "Change status to sent_initialize_data"
+    puts 'Change status to sent_initialize_data'
   end
 
   def connected!
     @value = :connected
-    puts "Change status to connected"
+    puts 'Change status to connected'
   end
 
   def reset!
     @value = :disconnected
-    puts "Change status to disconnected, because stuck"
+    puts 'Change status to disconnected, because stuck'
   end
 end

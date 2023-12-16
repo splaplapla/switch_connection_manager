@@ -1,133 +1,124 @@
 # 対プロコンに接続してボタンなどの入力を読み取る
 class SwitchConnectionManager::Procon
   class ReadTimeoutError < StandardError; end
-
-  CONFIGURATION_STEPS = [
-    "01000000000000000000480000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-48
-    "01010000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-02 device request
-    "01020000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-08 Set shipment low power state
-    "01030000000000000000100060000010000000000000000000000000000000000000000000000000000000000000000000", # 01-10-0060, Serial number
-    "0104000000000000000010506000000d000000000000000000000000000000000000000000000000000000000000000000", # 01-10-5060, Controller Color
-    "0105000000000000000001044c748786451c00043c4e696e74656e646f2053776974636800000000006800c0883cd37900", # 01-01, Bluetooth manual pairing
-    "01070000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000", # 01-04, Trigger buttons elapsed time
-    "01080000000000000000108060000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-8060, Factory Sensor and Stick device parameters
-    "01090000000000000000109860000012000000000000000000000000000000000000000000000000000000000000000000", # 01-10-9860, Factory Stick device parameters 2
-    "010a0000000000000000101080000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-1080, User Analog sticks calibration
-    "010c0000000000000000103d60000019000000000000000000000000000000000000000000000000000000000000000000", # 01-10-3d60, Factory configuration & calibration 2
-    "010d0000000000000000102880000018000000000000000000000000000000000000000000000000000000000000000000", # 01-10-2880, User 6-Axis Motion Sensor calibration
-    # "010e00000000000000004001", # 01-40. 01-03-30で有効化するので不要
-    # "010000000000000000004800", # vibration
-    # "0101000000000000000030f0", # led
-    # "010200000000000000003801", # home button led
-  ]
+  class ProconNotFound < StandardError; end
 
   attr_accessor :procon
 
   def initialize
-    @status = SwitchConnectionManager::ProconConnectionStatus.new
+    @procon_connection_status = SwitchConnectionManager::ProconConnectionStatus.new
     @configuration_steps = []
     @internal_status = SwitchConnectionManager::ProconInternalStatus.new
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
       @configuration_steps << step
     end
 
-    at_exit do
-      $terminated = true
-      if procon
-        begin
-          non_blocking_read_with_timeout
-        rescue ReadTimeoutError
-        end
-        send_to_procon("8005")
-        send_to_procon("010200000000000000003800") # off home bottun led
-        4.times do
-          non_blocking_read_with_timeout
-        rescue ReadTimeoutError
-        end
-        procon.close
-      end
-    end
+    prepare!
   end
 
-  def run
-    @procon = SwitchConnectionManager::ProconBulder.new(find_procon_device).build
-
+  # @return [void] ブロッキングする
+  def read_and_print
+    sleep(0.5)
     loop do
-      do_once
+      break if @terminated
+
+      non_blocking_read_with_timeout
+    rescue ReadTimeoutError
+      print '.'
     end
   end
+
+  # @return [File]
+  def device
+    procon
+  end
+
+  def shutdown
+    return unless procon
+
+    @terminated = true
+
+    # 未送信のデータを吐き出す。いらないかも
+    begin
+      non_blocking_read_with_timeout
+    rescue ReadTimeoutError
+    end
+    send_to_procon('8005')
+    send_to_procon('010200000000000000003800') # off home bottun led
+    # 未送信のデータを吐き出す。いらないかも
+    4.times do
+      non_blocking_read_with_timeout
+    rescue ReadTimeoutError
+      # no-op
+    end
+    procon.close
+  end
+
+  private
 
   def do_once
-    if @status.disconnected?
+    if @procon_connection_status.disconnected?
       send_initialize_data
-      @status.sent_initialize_data!
-      return nil
+      @procon_connection_status.sent_initialize_data!
+      return
     end
 
-    if @status.sent_initialize_data?
+    if @procon_connection_status.sent_initialize_data?
       raw_data = non_blocking_read_with_timeout
-      data = raw_data.unpack("H*").first
+      data = raw_data.unpack1('H*')
 
       case data
       when /^8101/ # 810100032dbd42e9b69800 的なやつがくる
-        return send_to_procon "8002"
+        send_to_procon '8002'
+        return
       when /^8102/
-        return send_to_procon "010100000000000000000330"
+        send_to_procon '010100000000000000000330'
+        return
       when /^21.+?8003000/
         loop do
           if @internal_status.has_unreceived_command?
             send_to_procon(@internal_status.unreceived_byte)
           else
-            if(configuration_step = @configuration_steps.shift)
-              @internal_status.mark_as_send(step: configuration_step)
-              send_to_procon(@internal_status.byte_of(step: configuration_step))
-            else
-              break
-            end
+            break unless (configuration_step = @configuration_steps.shift)
+
+            @internal_status.mark_as_send(step: configuration_step)
+            send_to_procon(@internal_status.byte_of(step: configuration_step))
           end
 
           begin
             raw_data = non_blocking_read_with_timeout
-            @internal_status.receive(raw_data: raw_data)
+            @internal_status.receive(raw_data:)
           rescue ReadTimeoutError
-            print "."
+            print '.'
           end
         end
 
-        out = send_to_procon "8004"
-        start_input_report_receiver_thread
-        @status.connected!
-        return out
+        send_to_procon '8004'
+        @procon_connection_status.connected!
+        return true
       else
         return
       end
     end
-
-    connection_sleep
   rescue ReadTimeoutError
-    @status.reset!
-    send_to_procon("8006") # タイムアウトをしたらこれでリセットが必要
+    @procon_connection_status.reset!
+    send_to_procon('8006') # タイムアウトをしたらこれでリセットが必要
     retry
   end
 
-  def send_initialize_data
-    send_to_procon("0000")
-    send_to_procon("0000")
-    send_to_procon("8005")
-    send_to_procon("0000")
-    send_to_procon("8001")
-  end
+  # @return [void]
+  def prepare!
+    @procon = find_procon_device
 
-  def send_to_procon(data)
-    write(data)
-    return data
+    loop do
+      is_finished = do_once
+      break if is_finished
+    end
   end
-
-  private
 
   def write(data)
     to_stdout(">>> #{data}")
-    @procon.write_nonblock([data].pack("H*"))
+    @procon.write_nonblock([data].pack('H*'))
   rescue IO::EAGAINWaitReadable
     retry
   rescue Errno::EINVAL => e
@@ -138,12 +129,12 @@ class SwitchConnectionManager::Procon
 
   # @return [File]
   def find_procon_device
-    if path = SwitchConnectionManager::DeviceProconFinder.find
-      puts "Use #{path} as procon's device file"
-      return File.open(path, "w+b")
-    else
-      raise "not found procon error" # TODO erro class
-    end
+    raise ProconNotFound, 'not found procon error' unless path = SwitchConnectionManager::DeviceProconFinder.find
+
+    puts "Use #{path} as procon's device file"
+    File.open(path, 'w+b')
+
+    # TODO: erro class
   end
 
   def to_stdout(text)
@@ -157,6 +148,7 @@ class SwitchConnectionManager::Procon
       non_blocking_read
     rescue IO::EAGAINWaitReadable
       raise(ReadTimeoutError) if timeout < Time.now
+
       retry
     end
   end
@@ -164,31 +156,27 @@ class SwitchConnectionManager::Procon
   # @raise [IO::EAGAINWaitReadable]
   def non_blocking_read
     raw_data = procon.read_nonblock(64)
-    to_stdout("<<< #{raw_data.unpack("H*").first}")
-    return raw_data
+    to_stdout("<<< #{raw_data.unpack1('H*')}")
+    raw_data
   end
 
   def blocking_read
     raw_data = procon.read(64)
-    to_stdout("<<< #{raw_data.unpack("H*").first}")
-    return raw_data
+    to_stdout("<<< #{raw_data.unpack1('H*')}")
+    raw_data
   end
 
-  def connection_sleep
-    sleep(1)
+  def send_initialize_data
+    send_to_procon('8006') # 最初に送ると安定するっぽい？（検証が必要）
+    send_to_procon('0000')
+    send_to_procon('0000')
+    send_to_procon('8005')
+    send_to_procon('0000')
+    send_to_procon('8001')
   end
 
-  def start_input_report_receiver_thread
-    sleep(0.5)
-    Thread.start do
-      break if $terminated
-      loop do
-        begin
-          raw_data = non_blocking_read_with_timeout
-        rescue ReadTimeoutError
-          print "."
-        end
-      end
-    end
+  def send_to_procon(data)
+    write(data)
+    data
   end
 end
