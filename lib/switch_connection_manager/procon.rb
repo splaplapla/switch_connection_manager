@@ -3,7 +3,7 @@ class SwitchConnectionManager::Procon
   class ReadTimeoutError < StandardError; end
   class ProconNotFound < StandardError; end
 
-  attr_accessor :procon
+  attr_accessor :procon, :mac_addr
 
   def initialize
     @procon_connection_status = SwitchConnectionManager::ProconConnectionStatus.new
@@ -21,6 +21,10 @@ class SwitchConnectionManager::Procon
     loop do
       is_finished = do_once
       break if is_finished
+    end
+
+    if mac_addr.nil?
+      raise '接続が完了していたらmac_addrがセットされているべき'
     end
   end
 
@@ -88,6 +92,7 @@ class SwitchConnectionManager::Procon
 
       case data
       when /^8101/ # 810100032dbd42e9b69800 的なやつがくる
+        write_mac_addr(data)
         send_to_procon '8002'
         nil
       when /^8102/
@@ -186,5 +191,12 @@ class SwitchConnectionManager::Procon
   def send_to_procon(data)
     write(data)
     data
+  end
+
+  def write_mac_addr(data)
+    unless /81010003(\w{12})/ =~ data
+      raise '入力がMACアドレスではない'
+    end
+    @mac_addr = $1
   end
 end

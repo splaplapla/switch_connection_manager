@@ -11,6 +11,7 @@ require 'switch_connection_manager'
 
 procon = SwitchConnectionManager::Procon.new
 procon.prepare!
+puts "procon.mac_addr is `#{procon.mac_addr}`"
 
 self_read, self_write = IO.pipe
 %w[TERM INT QUIT].each do |sig|
