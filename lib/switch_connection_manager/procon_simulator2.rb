@@ -1,7 +1,7 @@
 class SwitchConnectionManager::ProconSimulator2
   attr_accessor :gadget
 
-  MAC_ADDR = '00005e00535e'
+  MAC_ADDR = '176d96e7a548'
 
   UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
 
