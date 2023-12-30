@@ -1,6 +1,6 @@
 require "spec_helper"
 
-xdescribe SwitchConnectionManager::Procon do
+xdescribe SwitchConnectionManager::OldProcon do
   let(:simulator) { described_class.new }
   let(:initial_input) { SwitchConnectionManager::ProconSimulator::UART_INITIAL_INPUT }
 

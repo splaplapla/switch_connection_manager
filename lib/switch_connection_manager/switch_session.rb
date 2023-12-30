@@ -1,4 +1,4 @@
-class SwitchConnectionManager::ProconSimulator2
+class SwitchConnectionManager::SwitchSession
   attr_accessor :gadget
 
   MAC_ADDR = '176d96e7a548'
