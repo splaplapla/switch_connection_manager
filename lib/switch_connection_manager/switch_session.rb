@@ -5,10 +5,11 @@ class SwitchConnectionManager::SwitchSession
 
   UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
 
-  def initialize(mac_addr: nil)
+  def initialize(mac_addr: nil, procon_file: nil)
     @response_counter = 0
     @procon_simulator_thread = nil
     @mac_addr = mac_addr || MAC_ADDR
+    @procon_file = procon_file
   end
 
   def run
