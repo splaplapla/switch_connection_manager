@@ -5,9 +5,10 @@ class SwitchConnectionManager::ProconSimulator2
 
   UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
 
-  def initialize
+  def initialize(mac_addr: nil)
     @response_counter = 0
     @procon_simulator_thread = nil
+    @mac_addr = mac_addr || MAC_ADDR
   end
 
   def run
@@ -32,7 +33,7 @@ class SwitchConnectionManager::ProconSimulator2
         return nil
       when "8001"
         response(
-          make_response("81", "01", "0003#{MAC_ADDR}")
+          make_response("81", "01", "0003#{@mac_addr}")
         )
       when "8002"
         response("8102")
@@ -48,7 +49,7 @@ class SwitchConnectionManager::ProconSimulator2
       when "01" # Bluetooth manual pairing
         uart_response("81", sub_command, "03")
       when "02" # Request device info
-        uart_response("82", sub_command, "03480302#{MAC_ADDR.reverse}0301")
+        uart_response("82", sub_command, "03480302#{@mac_addr.reverse}0301")
       when "03", "08", "30", "38", "40", "48" # 01-03, 01-8, 01-30, 01-38, 01-40, 01-48
         uart_response("80", sub_command, [])
       when "04" # Trigger buttons elapsed time

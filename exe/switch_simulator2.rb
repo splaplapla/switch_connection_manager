@@ -4,4 +4,7 @@
 require "bundler/setup"
 require "switch_connection_manager"
 
-SwitchConnectionManager::ProconSimulator2.new.run
+procon = SwitchConnectionManager::Procon.new
+procon.prepare!
+
+SwitchConnectionManager::ProconSimulator2.new(mac_addr: procon.mac_addr).run

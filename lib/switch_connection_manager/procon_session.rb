@@ -1,5 +1,5 @@
 # 対プロコンに接続してボタンなどの入力を読み取る
-class SwitchConnectionManager::Procon
+class SwitchConnectionManager::ProconSession
   class ReadTimeoutError < StandardError; end
   class ProconNotFound < StandardError; end
 
@@ -23,7 +23,7 @@ class SwitchConnectionManager::Procon
       break if is_finished
     end
 
-    if mac_addr.nil?
+    if @mac_addr.nil?
       raise '接続が完了していたらmac_addrがセットされているべき'
     end
   end
