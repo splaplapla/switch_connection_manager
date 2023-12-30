@@ -5,23 +5,28 @@ class SwitchConnectionManager::SwitchSession
 
   UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
 
+  # @param [String, nil] mac_addr
+  # @param [File, nil] procon_file
   def initialize(mac_addr: nil, procon_file: nil)
     @response_counter = 0
     @procon_simulator_thread = nil
     @mac_addr = mac_addr || MAC_ADDR
     @procon_file = procon_file
+    @gadget = find_gadget_devices
+  end
+
+  def prepare!
+
   end
 
   def run
-    init_devices
-
     loop do
       read_once
     end
   end
 
   def read_once
-    raw_data = read
+    raw_data = non_blocking_read_with_timeout
     first_data_part = raw_data[0].unpack("H*").first
 
     return if first_data_part == "10" && raw_data.size == 10
@@ -33,11 +38,11 @@ class SwitchConnectionManager::SwitchSession
       when "0000", "8005"
         return nil
       when "8001"
-        response(
+        responseo_to_switch(
           make_response("81", "01", "0003#{@mac_addr}")
         )
       when "8002"
-        response("8102")
+        responseo_to_switch("8102")
       when "8004"
         start_procon_simulator_thread
         return nil
@@ -85,12 +90,24 @@ class SwitchConnectionManager::SwitchSession
 
   private
 
-  def read
+  def non_blocking_read
     data = gadget.read_nonblock(64)
     to_stdout(">>> #{data.unpack("H*").first}")
     return data
   rescue IO::EAGAINWaitReadable
     retry
+  end
+
+  def non_blocking_read_with_timeout
+    timeout = Time.now + 1
+
+    begin
+      non_blocking_read
+    rescue IO::EAGAINWaitReadable
+      raise(ReadTimeoutError) if timeout < Time.now
+
+      retry
+    end
   end
 
   # @return [String] switchに入力する用の128byte data
@@ -106,20 +123,20 @@ class SwitchConnectionManager::SwitchSession
 
   def uart_response(code, subcmd, data)
     buf = [UART_INITIAL_INPUT, code, subcmd, data].join
-    response(
+    responseo_to_switch(
       make_response("21", response_counter, buf)
     )
   end
 
   def input_response
-    response(
+    responseo_to_switch(
       make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
     )
   end
 
-  def response(data)
+  def responseo_to_switch(data)
     write(data)
-    return data
+    data
   end
 
   # @return [String]
@@ -151,7 +168,7 @@ class SwitchConnectionManager::SwitchSession
       end
   end
 
-  def init_devices
+  def find_gadget_devices
     SwitchConnectionManager::UsbDeviceController.reset
     SwitchConnectionManager::UsbDeviceController.init
 
