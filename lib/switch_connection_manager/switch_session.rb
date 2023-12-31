@@ -88,6 +88,10 @@ class SwitchConnectionManager::SwitchSession
     end
   end
 
+  def shutdown
+    # no-op
+  end
+
   private
 
   def non_blocking_read

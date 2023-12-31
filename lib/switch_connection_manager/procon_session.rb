@@ -23,9 +23,9 @@ class SwitchConnectionManager::ProconSession
       break if is_finished
     end
 
-    if @mac_addr.nil?
-      raise '接続が完了していたらmac_addrがセットされているべき'
-    end
+    return unless @mac_addr.nil?
+
+    raise '接続が完了していたらmac_addrがセットされているべき'
   end
 
   # @return [void] ブロッキングする
@@ -47,6 +47,7 @@ class SwitchConnectionManager::ProconSession
 
   def shutdown
     return unless procon
+
     SwitchConnectionManager.logger.info('Shutdown procon')
 
     @terminated = true
@@ -59,13 +60,13 @@ class SwitchConnectionManager::ProconSession
     send_to_procon('8005')
     send_to_procon('010200000000000000003800') # off home bottun led
 
-    send_to_procon("010500000000000000003800")
-    send_to_procon("010600000000000000003800")
-    send_to_procon("010700000000000000003800")
-    send_to_procon("010800000000000000003800")
-    send_to_procon("8005")
-    send_to_procon("8005")
-    send_to_procon("8005")
+    send_to_procon('010500000000000000003800')
+    send_to_procon('010600000000000000003800')
+    send_to_procon('010700000000000000003800')
+    send_to_procon('010800000000000000003800')
+    send_to_procon('8005')
+    send_to_procon('8005')
+    send_to_procon('8005')
     # 未送信のデータを吐き出す。いらないかも
     4.times do
       non_blocking_read_with_timeout
@@ -141,7 +142,7 @@ class SwitchConnectionManager::ProconSession
 
   # @return [File]
   def find_procon_device
-    raise ProconNotFound, 'not found procon error' unless(path = SwitchConnectionManager::DeviceProconFinder.find)
+    raise ProconNotFound, 'not found procon error' unless (path = SwitchConnectionManager::DeviceProconFinder.find)
 
     SwitchConnectionManager.logger.info "Use #{path} as procon's device file"
     `sudo chmod 777 #{path}`
@@ -197,6 +198,7 @@ class SwitchConnectionManager::ProconSession
     unless /81010003(\w{12})/ =~ data
       raise '入力がMACアドレスではない'
     end
-    @mac_addr = $1
+
+    @mac_addr = ::Regexp.last_match(1)
   end
 end
