@@ -196,7 +196,7 @@ class SwitchConnectionManager::ProconSession
 
   def write_mac_addr(data)
     unless /81010003(\w{12})/ =~ data
-      raise '入力がMACアドレスではない'
+      raise "入力(#{data})はMACアドレスではない"
     end
 
     @mac_addr = ::Regexp.last_match(1)
