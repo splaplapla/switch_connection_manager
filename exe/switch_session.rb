@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "bundler/setup"
-require "switch_connection_manager"
+require 'bundler/setup'
+require 'switch_connection_manager'
 
-procon = SwitchConnectionManager::ProconSession.new
-procon.prepare!
+procon_session = SwitchConnectionManager::ProconSession.new
+procon_session.prepare!
 
 self_read, self_write = IO.pipe
 %w[TERM INT QUIT].each do |sig|
@@ -14,11 +14,15 @@ self_read, self_write = IO.pipe
   end
 end
 
-switch_session = SwitchConnectionManager::SwitchSession.new(mac_addr: procon.mac_addr, procon_file: procon.device)
+switch_session = SwitchConnectionManager::SwitchSession.new(
+  mac_addr: procon_session.mac_addr, procon_file: procon_session.device,
+)
 switch_session.prepare!
 
 Thread.new do
-  switch_session.run
+  loop do
+    switch_session.device.write(procon_session.non_blocking_read_with_timeout)
+  end
 end
 
 while (readable_io = IO.select([self_read]))

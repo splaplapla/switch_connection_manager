@@ -19,7 +19,7 @@ class SwitchConnectionManager::ProconSession
     @procon = find_procon_device
 
     loop do
-      is_finished = do_once
+      is_finished = read_once
       break if is_finished
     end
 
@@ -80,7 +80,7 @@ class SwitchConnectionManager::ProconSession
 
   private
 
-  def do_once
+  def read_once
     if @procon_connection_status.disconnected?
       send_initialize_data
       @procon_connection_status.sent_initialize_data!

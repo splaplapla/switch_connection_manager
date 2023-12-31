@@ -12,17 +12,19 @@ class SwitchConnectionManager::SwitchSession
     @procon_simulator_thread = nil
     @mac_addr = mac_addr || MAC_ADDR
     @procon_file = procon_file
-    @gadget = find_gadget_devices
   end
 
   def prepare!
+    @gadget = find_gadget_devices
 
-  end
-
-  def run
     loop do
       read_once
+      break if @finish_prepare
     end
+  end
+
+  def device
+    @gadget
   end
 
   def read_once
@@ -44,7 +46,7 @@ class SwitchConnectionManager::SwitchSession
       when "8002"
         responseo_to_switch("8102")
       when "8004"
-        start_procon_simulator_thread
+        @finish_prepare = true
         return nil
       else
         puts "#{raw_data.unpack("H*").first} is unknown!!!!!!(1)"
@@ -89,7 +91,7 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def shutdown
-    # no-op
+    @gadget.close
   end
 
   private
