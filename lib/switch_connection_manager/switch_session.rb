@@ -21,6 +21,11 @@ class SwitchConnectionManager::SwitchSession
       read_once
       break if @finish_prepare
     end
+
+    # どんなコントローラーか識別するためのpre bypassフェーズ
+    50.times do
+      read_once
+    end
   end
 
   def device

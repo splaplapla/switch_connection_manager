@@ -78,6 +78,18 @@ class SwitchConnectionManager::ProconSession
     SwitchConnectionManager.logger.info('Shutdown procon finished')
   end
 
+  def non_blocking_read_with_timeout
+    timeout = Time.now + 1
+
+    begin
+      non_blocking_read
+    rescue IO::EAGAINWaitReadable
+      raise(ReadTimeoutError) if timeout < Time.now
+
+      retry
+    end
+  end
+
   private
 
   def read_once
@@ -153,18 +165,6 @@ class SwitchConnectionManager::ProconSession
 
   def to_stdout(text)
     SwitchConnectionManager.logger.debug(text)
-  end
-
-  def non_blocking_read_with_timeout
-    timeout = Time.now + 1
-
-    begin
-      non_blocking_read
-    rescue IO::EAGAINWaitReadable
-      raise(ReadTimeoutError) if timeout < Time.now
-
-      retry
-    end
   end
 
   # @raise [IO::EAGAINWaitReadable]
