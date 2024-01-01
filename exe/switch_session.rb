@@ -7,6 +7,13 @@ require 'switch_connection_manager'
 procon_session = SwitchConnectionManager::ProconSession.new
 procon_session.prepare!
 
+puts 'procon testing...'
+10.times do
+  procon_session.read_once
+end
+puts 'finished procon testing.'
+puts "procon.mac_addr is `#{procon_session.mac_addr}`"
+
 self_read, self_write = IO.pipe
 %w[TERM INT QUIT].each do |sig|
   trap sig do

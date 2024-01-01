@@ -17,7 +17,6 @@ puts 'procon testing...'
   procon_session.read_once
 end
 puts 'finished procon testing.'
-
 puts "procon.mac_addr is `#{procon_session.mac_addr}`"
 
 self_read, self_write = IO.pipe
