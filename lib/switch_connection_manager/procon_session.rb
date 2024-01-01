@@ -145,9 +145,6 @@ class SwitchConnectionManager::ProconSession
     retry
   end
 
-  def established_connection
-  end
-
   private
 
   def write(data)
