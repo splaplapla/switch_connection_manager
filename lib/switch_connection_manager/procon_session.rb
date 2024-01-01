@@ -59,16 +59,17 @@ class SwitchConnectionManager::ProconSession
     end
     send_to_procon('8005')
     send_to_procon('010200000000000000003800') # off home bottun led
-
     send_to_procon('010500000000000000003800')
     send_to_procon('010600000000000000003800')
     send_to_procon('010700000000000000003800')
     send_to_procon('010800000000000000003800')
-    send_to_procon('8005')
-    send_to_procon('8005')
-    send_to_procon('8005')
+
+    send_to_procon('0100000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+    send_to_procon('0101000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+
+    SwitchConnectionManager.logger.info('starting drain')
     # 未送信のデータを吐き出す。いらないかも
-    4.times do
+    10.times do
       non_blocking_read_with_timeout
     rescue ReadTimeoutError
       # no-op
@@ -137,7 +138,9 @@ class SwitchConnectionManager::ProconSession
     end
   rescue ReadTimeoutError
     @procon_connection_status.reset!
+    SwitchConnectionManager.logger.info "[read timeout] #{@procon_connection_status.value}"
     send_to_procon('8006') # タイムアウトをしたらこれでリセットが必要
+    send_to_procon('0100000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
     retry
   end
 
@@ -159,8 +162,6 @@ class SwitchConnectionManager::ProconSession
     SwitchConnectionManager.logger.info "Use #{path} as procon's device file"
     `sudo chmod 777 #{path}`
     File.open(path, 'w+b')
-
-    # TODO: erro class
   end
 
   def to_stdout(text)
@@ -182,10 +183,10 @@ class SwitchConnectionManager::ProconSession
 
   def send_initialize_data
     # https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_subcommands_notes.md#subcommand-0x07-reset-pairing-info
-    send_to_procon('0100000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
-    send_to_procon('0101000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
-    send_to_procon('0102000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
-    non_blocking_read_with_timeout
+    # send_to_procon('0100000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+    # send_to_procon('0101000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+    # send_to_procon('0102000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+    # send_to_procon('0000')
 
     send_to_procon('8006') # 最初に送ると安定するっぽい？（検証が必要）
     send_to_procon('0000')
@@ -202,7 +203,9 @@ class SwitchConnectionManager::ProconSession
 
   def write_mac_addr(data)
     unless /81010003(\w{12})/ =~ data
-      raise "入力(#{data})はMACアドレスではない"
+      "入力(#{data})はMACアドレスではない"
+
+      SwitchConnectionManager.logger.warn("この入力はMACアドレスではない(#{data[0..10]})")
     end
 
     @mac_addr = ::Regexp.last_match(1)
