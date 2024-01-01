@@ -182,8 +182,10 @@ class SwitchConnectionManager::ProconSession
 
   def send_initialize_data
     # https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_subcommands_notes.md#subcommand-0x07-reset-pairing-info
-    send_to_procon('0100000000000000000007') # Reset pairing info
-    blocking_read
+    send_to_procon('0100000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+    send_to_procon('0101000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+    send_to_procon('0102000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
+    non_blocking_read_with_timeout
 
     send_to_procon('8006') # 最初に送ると安定するっぽい？（検証が必要）
     send_to_procon('0000')
