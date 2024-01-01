@@ -1,4 +1,6 @@
 class SwitchConnectionManager::SwitchSession
+  class ReadTimeoutError < StandardError; end
+
   attr_accessor :gadget
 
   MAC_ADDR = '176d96e7a548'
@@ -22,9 +24,13 @@ class SwitchConnectionManager::SwitchSession
       break if @finish_prepare
     end
 
-    # どんなコントローラーか識別するためのpre bypassフェーズ
-    50.times do
-      read_once
+    begin
+      # どんなコントローラーか識別するためのpre bypassフェーズ
+      50.times do
+        read_once
+      end
+    rescue ReadTimeoutError
+      SwitchConnectionManager.logger.info "[read timeout] pre bypassフェーズでタイムアウトをしました. prepare!を終了します"
     end
   end
 
