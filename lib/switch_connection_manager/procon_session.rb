@@ -70,10 +70,13 @@ class SwitchConnectionManager::ProconSession
     SwitchConnectionManager.logger.info('starting drain')
     # 未送信のデータを吐き出す。いらないかも
     10.times do
-      non_blocking_read_with_timeout
-    rescue ReadTimeoutError
-      # no-op
+      begin
+        non_blocking_read
+      rescue IO::EAGAINWaitReadable
+        print '.'
+      end
     end
+
     procon.close
 
     SwitchConnectionManager.logger.info('Shutdown procon finished')
@@ -90,8 +93,6 @@ class SwitchConnectionManager::ProconSession
       retry
     end
   end
-
-  private
 
   def read_once
     if @procon_connection_status.disconnected?
@@ -143,6 +144,11 @@ class SwitchConnectionManager::ProconSession
     send_to_procon('0100000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
     retry
   end
+
+  def established_connection
+  end
+
+  private
 
   def write(data)
     to_stdout(">>> #{data}")
