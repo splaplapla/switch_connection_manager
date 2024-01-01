@@ -121,12 +121,6 @@ class SwitchConnectionManager::SwitchSession
     end
   end
 
-  # @return [String] switchに入力する用の128byte data
-  def make_response(code, cmd, buf)
-    buf = [code, cmd, buf].join
-    buf.ljust(128, "0")
-  end
-
   def spi_response(addr, data)
     buf = [addr, "00", "00", "10", data].join
     uart_response("90", "10", buf)
@@ -139,10 +133,10 @@ class SwitchConnectionManager::SwitchSession
     )
   end
 
-  def input_response
-    responseo_to_switch(
-      make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
-    )
+  # @return [String] switchに入力する用の128byte data
+  def make_response(code, cmd, buf)
+    buf = [code, cmd, buf].join
+    buf.ljust(128, "0")
   end
 
   def responseo_to_switch(data)
@@ -194,5 +188,11 @@ class SwitchConnectionManager::SwitchSession
 
   def debug_log(text)
     puts("[debug] #{text}") if ENV["VERBOSE"]
+  end
+
+  def any_input_response
+    responseo_to_switch(
+      make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
+    )
   end
 end
