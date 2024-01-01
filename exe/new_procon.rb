@@ -30,6 +30,9 @@ Thread.new do
   procon_session.read_and_print # ブロッキングする
 end
 
+sleep 1
+Process.kill 'TERM', $$
+
 while (readable_io = IO.select([self_read]))
   signal = readable_io.first[0].gets.strip
   case signal

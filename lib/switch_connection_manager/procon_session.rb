@@ -57,17 +57,16 @@ class SwitchConnectionManager::ProconSession
       non_blocking_read_with_timeout
     rescue ReadTimeoutError
     end
-    send_to_procon('8005')
+    # send_to_procon('8005')
     send_to_procon('010200000000000000003800') # off home bottun led
     send_to_procon('010500000000000000003800')
     send_to_procon('010600000000000000003800')
     send_to_procon('010700000000000000003800')
     send_to_procon('010800000000000000003800')
 
+    SwitchConnectionManager.logger.info('starting drain')
     send_to_procon('0100000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
     send_to_procon('0101000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
-
-    SwitchConnectionManager.logger.info('starting drain')
     # 未送信のデータを吐き出す。いらないかも
     10.times do
       begin
@@ -191,7 +190,9 @@ class SwitchConnectionManager::ProconSession
     # send_to_procon('0102000000000000000007000000000000000000000000000000000000000000') # Reset pairing info
     # send_to_procon('0000')
 
-    send_to_procon('8006') # 最初に送ると安定するっぽい？（検証が必要）
+    # send_to_procon('0101000000000000000006020000000000000000000000000000000000000000') # Reset pairing info
+
+    # send_to_procon('8006') # 最初に送ると安定するっぽい？（検証が必要）
     send_to_procon('0000')
     send_to_procon('0000')
     send_to_procon('8005')
