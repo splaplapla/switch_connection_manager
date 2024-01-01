@@ -14,7 +14,7 @@ procon_session.prepare!
 
 puts 'procon testing...'
 10.times do
-  procon_session.read_and_print
+  procon_session.read_once
 end
 puts 'finished procon testing.'
 
