@@ -20,8 +20,6 @@ puts
 puts '-----------------------'
 puts
 puts "procon.mac_addr is `#{procon_session.mac_addr}`"
-puts "procon.connection_id is `#{procon_session.connection_id}`"
-puts "procon.battery_level is `#{procon_session.battery_level}`"
 puts
 puts '-----------------------'
 puts
