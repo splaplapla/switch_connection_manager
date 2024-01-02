@@ -6,7 +6,7 @@ class SwitchConnectionManager::SwitchSession
   MAC_ADDR = '176d96e7a548'
 
   # UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
-  UART_INITIAL_INPUT = '8100 8000 f8d7 7a22'.gsub(' ')
+  UART_INITIAL_INPUT = '8100 8000 f8d7 7a22'.gsub(' ', '')
 
   # @param [String, nil] mac_addr
   # @param [File, nil] procon_file
