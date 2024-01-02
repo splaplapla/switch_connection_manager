@@ -26,7 +26,17 @@ switch_session.prepare!
 puts 'starting switch session read...'
 Thread.new do
   loop do
+    break if switch_session.terminated?
+
     switch_session.device.write(procon_session.non_blocking_read_with_timeout)
+  end
+end
+
+Thread.new do
+  loop do
+    break if switch_session.terminated?
+
+    switch_session.send(:read_once)
   end
 end
 
@@ -49,4 +59,3 @@ while (readable_io = IO.select([self_read]))
     exit
   end
 end
-
