@@ -5,7 +5,8 @@ class SwitchConnectionManager::SwitchSession
 
   MAC_ADDR = '176d96e7a548'
 
-  UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
+  # UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
+  UART_INITIAL_INPUT = '8100 8000 f8d7 7a22'.gsub(' ')
 
   # @param [String, nil] mac_addr
   # @param [File, nil] procon_file
@@ -193,9 +194,6 @@ class SwitchConnectionManager::SwitchSession
 
   def any_input_response
     sleep(0.03)
-    # - recognizided
-    # 302c98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000
-    # - not
     raw_data = make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
     responseo_to_switch(raw_data)
   end
