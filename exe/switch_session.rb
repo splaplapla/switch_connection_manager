@@ -17,7 +17,7 @@ puts "procon.mac_addr is `#{procon_session.mac_addr}`"
 
 puts 'starting switch session...'
 switch_session = SwitchConnectionManager::SwitchSession.new(
-  mac_addr: procon_session.mac_addr, procon_file: procon_session.device,
+  mac_addr: procon_session.mac_addr, procon_file: procon_session.device
 )
 
 puts 'starting switch session prepare...'
@@ -26,10 +26,9 @@ switch_session.prepare!
 puts 'starting switch session read...'
 Thread.new do
   loop do
-    switch_session.device.write(procon_session.non_blocking_read_with_timeout)
+    switch_session.read_once
   end
 end
-
 
 self_read, self_write = IO.pipe
 %w[TERM INT QUIT].each do |sig|

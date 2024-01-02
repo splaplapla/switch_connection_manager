@@ -25,15 +25,6 @@ class SwitchConnectionManager::SwitchSession
       break if @finish_prepare
     end
     log("prepare! finished")
-
-    begin
-      # どんなコントローラーか識別するためのpre bypassフェーズ
-      50.times do
-        read_once
-      end
-    rescue SwitchConnectionManager::SwitchSession::ReadTimeoutError
-      SwitchConnectionManager.logger.info "[read timeout] pre bypassフェーズでタイムアウトをしました. prepare!を終了します"
-    end
   end
 
   def device
@@ -60,7 +51,7 @@ class SwitchConnectionManager::SwitchSession
         responseo_to_switch("8102")
       when "8004"
         @finish_prepare = true
-        return nil
+        return
       else
         puts "#{raw_data.unpack("H*").first} is unknown!!!!!!(1)"
       end
@@ -111,7 +102,7 @@ class SwitchConnectionManager::SwitchSession
 
   def non_blocking_read
     data = gadget.read_nonblock(64)
-    log(">>> #{data.unpack("H*").first}")
+    log("[switch] >>> #{data.unpack("H*").first}")
     data
   end
 
