@@ -26,7 +26,6 @@ while (readable_io = IO.select([self_read]))
   signal = readable_io.first[0].gets.strip
   case signal
   when 'TERM', 'INT', 'QUIT'
-    procon_session.shutdown
     switch_session.shutdown
     exit
   end

@@ -162,7 +162,7 @@ class SwitchConnectionManager::SwitchSession
     @procon_simulator_thread =
       Thread.start do
         loop do
-          input_response
+          any_input_response
           sleep(0.03)
         rescue IO::EAGAINWaitReadable
           retry
