@@ -6,7 +6,7 @@ class SwitchConnectionManager::SwitchSession
   MAC_ADDR = '176d96e7a548'
 
   # UART_INITIAL_INPUT = '81008000f8d77a22c87b0c'
-  UART_INITIAL_INPUT = '8100 8000 f8d7 7a22'.gsub(' ', '')
+  UART_INITIAL_INPUT = '8100 8000 f8d7 7a22 c87b0c'.gsub(' ', '')
 
   # @param [String, nil] mac_addr
   # @param [File, nil] procon_file
@@ -202,6 +202,8 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def uart_initial_input
+    return UART_INITIAL_INPUT
+
     unless @connection_id
       log('connection_idが未設定なので初期値を使います')
       return UART_INITIAL_INPUT
