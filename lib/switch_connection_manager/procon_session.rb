@@ -30,7 +30,7 @@ class SwitchConnectionManager::ProconSession
 
   # @return [void] ブロッキングする
   def read_and_print
-    sleep(0.5)
+    # sleep(0.5)
     loop do
       break if @terminated
 
@@ -39,6 +39,16 @@ class SwitchConnectionManager::ProconSession
       print '.'
     end
   end
+
+  def blocking_read_and_print
+    loop do
+      break if @terminated
+
+      blocking_read
+    rescue ReadTimeoutError
+      print '.'
+    end
+	end
 
   # @return [File]
   def device

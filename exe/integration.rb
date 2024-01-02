@@ -10,10 +10,16 @@ procon_session.prepare!
 
 puts 'procon testing...'
 10.times do
-  procon_session.read_once
+  raw_data = procon_session.non_blocking_read_with_timeout
+  data = raw_data.unpack1('H*')
+  puts "procon testing: #{data}"
 end
 puts 'finished procon testing.'
 puts "procon.mac_addr is `#{procon_session.mac_addr}`"
+
+puts
+puts '-----------------------'
+puts
 
 puts 'starting switch session...'
 switch_session = SwitchConnectionManager::SwitchSession.new(
@@ -24,21 +30,27 @@ puts 'starting switch session prepare...'
 switch_session.prepare!
 
 puts 'starting switch session read...'
+# Switch <<< Procon
 Thread.new do
+  sleep 0.3
   loop do
     break if switch_session.terminated?
 
-    raw_data = procon_session.non_blocking_read_with_timeout
-    data = raw_data.unpack1('H*')
-    puts "procon_session input: #{data}"
+    real = true
 
-    # switch_session.send(:any_input_response)
-    switch_session.device.write(raw_data)
+    if real
+      raw_data = procon_session.non_blocking_read_with_timeout
+      # sleep 0.01
+      switch_session.device.write(raw_data)
+    else
+      switch_session.send(:any_input_response)
+    end
   end
 end
 
+# Switch >>> void
 Thread.new do
-  loop do
+  15.times do
     break if switch_session.terminated?
 
     switch_session.send(:read_once)
@@ -52,7 +64,7 @@ self_read, self_write = IO.pipe
   end
 end
 
-sleep 3
+sleep 8
 Process.kill 'TERM', $$
 
 while (readable_io = IO.select([self_read]))

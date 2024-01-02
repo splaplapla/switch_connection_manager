@@ -157,10 +157,11 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def write(data)
-    log("<<< #{data}")
     @gadget.write_nonblock([data].pack("H*"))
   rescue IO::EAGAINWaitReadable
     retry
+  ensure
+    log("[switch] <<< #{data}")
   end
 
   def start_procon_simulator_thread
@@ -190,14 +191,12 @@ class SwitchConnectionManager::SwitchSession
     puts(text)
   end
 
-  def debug_log(text)
-    puts("[debug] #{text}") if ENV["VERBOSE"]
-  end
-
   def any_input_response
     sleep(0.03)
-    responseo_to_switch(
-      make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
-    )
+    # - recognizided
+    # 302c98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000
+    # - not
+    raw_data = make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
+    responseo_to_switch(raw_data)
   end
 end

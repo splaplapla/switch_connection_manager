@@ -27,7 +27,7 @@ self_read, self_write = IO.pipe
 end
 
 Thread.new do
-  procon_session.read_and_print # ブロッキングする
+  procon_session.blocking_read_and_print # ブロッキングする
 end
 
 sleep 1
