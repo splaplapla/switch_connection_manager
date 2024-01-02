@@ -195,6 +195,7 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def any_input_response
+    sleep(0.03)
     responseo_to_switch(
       make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
     )
