@@ -28,8 +28,12 @@ Thread.new do
   loop do
     break if switch_session.terminated?
 
-    switch_session.send(:any_input_response)
-    # switch_session.device.write(procon_session.non_blocking_read_with_timeout)
+    # switch_session.send(:any_input_response)
+    raw_data = procon_session.non_blocking_read_with_timeout
+    data = raw_data.unpack1('H*')
+    puts "procon_session input: #{data}"
+
+    switch_session.device.write(raw_data)
   end
 end
 
