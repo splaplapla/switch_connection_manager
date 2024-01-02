@@ -19,17 +19,19 @@ class SwitchConnectionManager::SwitchSession
   def prepare!
     @gadget = find_gadget_devices
 
+    log("prepare! start")
     loop do
       read_once
       break if @finish_prepare
     end
+    log("prepare! finished")
 
     begin
       # どんなコントローラーか識別するためのpre bypassフェーズ
       50.times do
         read_once
       end
-    rescue ReadTimeoutError
+    rescue SwitchConnectionManager::SwitchSession::ReadTimeoutError
       SwitchConnectionManager.logger.info "[read timeout] pre bypassフェーズでタイムアウトをしました. prepare!を終了します"
     end
   end
@@ -114,7 +116,7 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def non_blocking_read_with_timeout
-    timeout = Time.now + 1
+    timeout = Time.now + 10
 
     begin
       non_blocking_read
