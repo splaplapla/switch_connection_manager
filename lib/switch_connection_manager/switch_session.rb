@@ -109,7 +109,7 @@ class SwitchConnectionManager::SwitchSession
 
   def non_blocking_read
     data = gadget.read_nonblock(64)
-    to_stdout(">>> #{data.unpack("H*").first}")
+    log(">>> #{data.unpack("H*").first}")
     return data
   rescue IO::EAGAINWaitReadable
     retry
@@ -161,7 +161,7 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def write(data)
-    to_stdout("<<< #{data}")
+    log("<<< #{data}")
     @gadget.write_nonblock([data].pack("H*"))
   rescue IO::EAGAINWaitReadable
     retry
@@ -188,7 +188,7 @@ class SwitchConnectionManager::SwitchSession
     @gadget = File.open('/dev/hidg0', "w+b")
   end
 
-  def to_stdout(text)
+  def log(text)
     puts(text)
   end
 
