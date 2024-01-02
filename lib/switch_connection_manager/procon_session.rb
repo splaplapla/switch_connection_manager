@@ -3,7 +3,7 @@ class SwitchConnectionManager::ProconSession
   class ReadTimeoutError < StandardError; end
   class ProconNotFound < StandardError; end
 
-  attr_accessor :procon, :mac_addr
+  attr_accessor :procon, :mac_addr, :connection_id, :battery_level
 
   def initialize
     @procon_connection_status = SwitchConnectionManager::ProconConnectionStatus.new
@@ -123,6 +123,8 @@ class SwitchConnectionManager::ProconSession
         send_to_procon '010100000000000000000330'
         nil
       when /^21.+?8003000/
+        self.connection_id_and_battery_level = data
+
         loop do
           if @prebypass_connection_status.has_unreceived_command?
             send_to_procon(@prebypass_connection_status.unreceived_byte)
@@ -223,5 +225,15 @@ class SwitchConnectionManager::ProconSession
     end
 
     @mac_addr = ::Regexp.last_match(1)
+  end
+
+  def connection_id_and_battery_level=(data)
+    return if @connection_id
+    unless(match = data.match(/21\w{2}(?<connection_id>\w{8})(?<battery_level>\w{8})/))
+      SwitchConnectionManager.logger.warn("この入力は接続IDとバッテリー残量ではない(#{data[0..10]})")
+    end
+
+    @connection_id = match[:connection_id]
+    @battery_level = match[:battery_level]
   end
 end
