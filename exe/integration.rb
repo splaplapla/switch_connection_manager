@@ -9,11 +9,11 @@ procon_session = SwitchConnectionManager::ProconSession.new
 procon_session.prepare!
 
 puts 'procon testing...'
-10.times do
-  raw_data = procon_session.non_blocking_read_with_timeout
-  data = raw_data.unpack1('H*')
-  puts "procon testing: #{data}"
-end
+# 10.times do
+#   raw_data = procon_session.non_blocking_read_with_timeout
+#   data = raw_data.unpack1('H*')
+#   puts "procon testing: #{data}"
+# end
 puts 'finished procon testing.'
 
 puts
@@ -40,16 +40,24 @@ switch_session.prepare!
 puts 'starting switch session read...'
 # Switch <<< Procon
 Thread.new do
-  sleep 0.3
+  sleep 1
+  count = 0
+  GC.disable
+
   loop do
+    count = count + 1
     break if switch_session.terminated?
 
-    real = true
+    # FIXME: 初期だとコントローラーが認識されないので認識されるinputを注入して、認識されたらbypassしたinputを渡す
+    real = count > 10 ? true : false
 
     if real
       raw_data = procon_session.non_blocking_read_with_timeout
-      # sleep 0.01
-      switch_session.device.write(raw_data)
+      begin
+        switch_session.device.write_nonblock(raw_data)
+      rescue IO::EAGAINWaitReadable
+        print '.'
+      end
     else
       switch_session.send(:any_input_response)
     end
@@ -72,7 +80,7 @@ self_read, self_write = IO.pipe
   end
 end
 
-sleep 8
+sleep 50
 Process.kill 'TERM', $$
 
 while (readable_io = IO.select([self_read]))

@@ -32,7 +32,7 @@ Thread.new do
   procon_session.blocking_read_and_print # ブロッキングする
 end
 
-sleep 1
+sleep 10
 Process.kill 'TERM', $$
 
 while (readable_io = IO.select([self_read]))
