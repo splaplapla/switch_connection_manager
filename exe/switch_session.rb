@@ -11,6 +11,13 @@ switch_session.prepare!
 
 puts 'starting switch session read...'
 switch_session.send(:start_procon_simulator_thread)
+Thread.new do
+  loop do
+    break if switch_session.terminated?
+
+    switch_session.send(:read_once)
+  end
+end
 
 self_read, self_write = IO.pipe
 %w[TERM INT QUIT].each do |sig|

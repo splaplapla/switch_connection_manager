@@ -95,7 +95,12 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def shutdown
+    @terminated = true
     @gadget.close
+  end
+
+  def terminated?
+    @terminated
   end
 
   private
@@ -162,6 +167,8 @@ class SwitchConnectionManager::SwitchSession
     @procon_simulator_thread =
       Thread.start do
         loop do
+          break if switch_session.terminated?
+
           any_input_response
           sleep(0.03)
         rescue IO::EAGAINWaitReadable
