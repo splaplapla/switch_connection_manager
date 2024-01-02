@@ -78,28 +78,29 @@ class SwitchConnectionManager::ProconInternalStatus
     def disable_vibration
       HIDSubCommandRequest.new(counter: @counter, sub_command: "48", arg: "00").to_byte
     end
+
+    def enable_imu
+      HIDSubCommandRequest.new(counter: @counter, sub_command: "40", arg: "02").to_byte
+    end
   end
 
   include Commander
 
   attr_accessor :counter
-  attr_accessor :player_light, :home_button_light
 
   SUB_COMMANDS = [
     # "18", # SPI read. not support
     # "12",
     ["30", "01"], # player_light
     ["38", "1FF0FF"], # home_button_light
+    ["40", "02"], # Enable IMU
   ]
 
   SUB_COMMANDS_ON_START = [
     # :enable_player_light,
     :disable_vibration,
     :enable_home_button_light,
-  ]
-
-  SUB_COMMANDS_ON_END = [
-    :disable_home_button_light,
+    :enable_imu,
   ]
 
   SUB_COMMANDS_NAME_TABLE = {
@@ -107,11 +108,13 @@ class SwitchConnectionManager::ProconInternalStatus
     disable_player_light: :player_light,
     enable_home_button_light: :home_button_light,
     disable_home_button_light: :home_button_light,
+    enable_imu: :enable_imu,
   }
 
   SUB_COMMANDS_ID_TABLE = {
     "30" => :player_light,
     "38" => :home_button_light,
+    "40" => :enable_imu,
   }
 
   def initialize
@@ -120,7 +123,10 @@ class SwitchConnectionManager::ProconInternalStatus
   end
 
   def mark_as_send(step: )
-    name = SUB_COMMANDS_NAME_TABLE[step]
+    unless SUB_COMMANDS_NAME_TABLE[step]
+      # FIXME: これなおす
+      # raise "SUB_COMMANDS_NAME_TABLEに#{step}が存在していません"
+    end
     @sub_command_received_status.sent!(step: step)
   end
 
@@ -145,6 +151,7 @@ class SwitchConnectionManager::ProconInternalStatus
     case data
     when /^21/
       response = HIDSubCommandResponse.parse(data)
+
       if SUB_COMMANDS_NAME_TABLE[@sub_command_received_status.step] == response.sub_command_name
         @sub_command_received_status.received_ack!
       else
@@ -154,7 +161,6 @@ class SwitchConnectionManager::ProconInternalStatus
   end
 
   def received?(step: )
-    name = SUB_COMMANDS_NAME_TABLE[step]
     @sub_command_received_status.received_ack?
   end
 
