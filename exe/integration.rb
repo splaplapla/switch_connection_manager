@@ -23,7 +23,10 @@ puts
 
 puts 'starting switch session...'
 switch_session = SwitchConnectionManager::SwitchSession.new(
-  mac_addr: procon_session.mac_addr, procon_file: procon_session.device
+  mac_addr: procon_session.mac_addr,
+  procon_file: procon_session.device,
+  connection_id: procon_session.connection_id,
+  battery_level: procon_session.battery_level
 )
 
 puts 'starting switch session prepare...'

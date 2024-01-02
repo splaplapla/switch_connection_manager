@@ -10,11 +10,14 @@ class SwitchConnectionManager::SwitchSession
 
   # @param [String, nil] mac_addr
   # @param [File, nil] procon_file
-  def initialize(mac_addr: nil, procon_file: nil)
+  def initialize(mac_addr: nil, procon_file: nil, connection_id: nil, battery_level: nil)
+    @terminated = false
     @response_counter = 0
     @procon_simulator_thread = nil
     @mac_addr = mac_addr || MAC_ADDR
     @procon_file = procon_file
+    @connection_id = connection_id
+    @battery_level = battery_level
   end
 
   def prepare!
@@ -130,7 +133,7 @@ class SwitchConnectionManager::SwitchSession
   end
 
   def uart_response(code, subcmd, data)
-    buf = [UART_INITIAL_INPUT, code, subcmd, data].join
+    buf = [uart_initial_input, code, subcmd, data].join
     responseo_to_switch(
       make_response("21", response_counter, buf)
     )
@@ -196,5 +199,14 @@ class SwitchConnectionManager::SwitchSession
     sleep(0.03)
     raw_data = make_response("30", response_counter, "98100800078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff1410280020002100000000000000000000000000000000")
     responseo_to_switch(raw_data)
+  end
+
+  def uart_initial_input
+    unless @connection_id
+      log('connection_idが未設定なので初期値を使います')
+      return UART_INITIAL_INPUT
+    end
+
+    "#{@connection_id}#{@battery_level}"
   end
 end
