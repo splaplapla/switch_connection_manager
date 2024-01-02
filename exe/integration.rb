@@ -28,11 +28,11 @@ Thread.new do
   loop do
     break if switch_session.terminated?
 
-    # switch_session.send(:any_input_response)
     raw_data = procon_session.non_blocking_read_with_timeout
     data = raw_data.unpack1('H*')
     puts "procon_session input: #{data}"
 
+    # switch_session.send(:any_input_response)
     switch_session.device.write(raw_data)
   end
 end
@@ -42,7 +42,6 @@ Thread.new do
     break if switch_session.terminated?
 
     switch_session.send(:read_once)
-    # switch_session.any_input_response
   end
 end
 
@@ -53,7 +52,7 @@ self_read, self_write = IO.pipe
   end
 end
 
-sleep 30
+sleep 3
 Process.kill 'TERM', $$
 
 while (readable_io = IO.select([self_read]))
