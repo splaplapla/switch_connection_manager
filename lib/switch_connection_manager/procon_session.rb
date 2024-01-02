@@ -229,7 +229,7 @@ class SwitchConnectionManager::ProconSession
 
   def connection_id_and_battery_level=(data)
     return if @connection_id
-    unless(match = data.match(/^21\w{2}(?<connection_id>\w{8})(?<battery_level>\w{8})/))
+    unless(match = data.match(/^21(?<timestamp>\w{2})(?<battery_level>\w{1})(?<connection_id>\w{8})/))
       SwitchConnectionManager.logger.warn("この入力は接続IDとバッテリー残量ではない(#{data[0..10]})")
     end
 

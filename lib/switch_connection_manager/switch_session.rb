@@ -207,6 +207,6 @@ class SwitchConnectionManager::SwitchSession
       return UART_INITIAL_INPUT
     end
 
-    "#{@connection_id}#{@battery_level}"
+    "#{@battery_level}#{@connection_id}"
   end
 end
