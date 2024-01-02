@@ -28,7 +28,7 @@ Thread.new do
   loop do
     break if switch_session.terminated?
 
-    switch_session.semd(:any_input_response)
+    switch_session.send(:any_input_response)
     # switch_session.device.write(procon_session.non_blocking_read_with_timeout)
   end
 end
