@@ -28,7 +28,8 @@ Thread.new do
   loop do
     break if switch_session.terminated?
 
-    switch_session.device.write(procon_session.non_blocking_read_with_timeout)
+    switch_session.any_input_response
+    # switch_session.device.write(procon_session.non_blocking_read_with_timeout)
   end
 end
 
@@ -37,6 +38,7 @@ Thread.new do
     break if switch_session.terminated?
 
     switch_session.send(:read_once)
+    # switch_session.any_input_response
   end
 end
 
