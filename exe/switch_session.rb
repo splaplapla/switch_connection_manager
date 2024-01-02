@@ -4,31 +4,13 @@
 require 'bundler/setup'
 require 'switch_connection_manager'
 
-puts 'starting procon session...'
-procon_session = SwitchConnectionManager::ProconSession.new
-procon_session.prepare!
-
-puts 'procon testing...'
-10.times do
-  procon_session.read_once
-end
-puts 'finished procon testing.'
-puts "procon.mac_addr is `#{procon_session.mac_addr}`"
-
-puts 'starting switch session...'
-switch_session = SwitchConnectionManager::SwitchSession.new(
-  mac_addr: procon_session.mac_addr, procon_file: procon_session.device
-)
+switch_session = SwitchConnectionManager::SwitchSession.new
 
 puts 'starting switch session prepare...'
 switch_session.prepare!
 
 puts 'starting switch session read...'
-Thread.new do
-  loop do
-    switch_session.read_once
-  end
-end
+switch_session.send(:start_procon_simulator_thread)
 
 self_read, self_write = IO.pipe
 %w[TERM INT QUIT].each do |sig|
@@ -37,7 +19,7 @@ self_read, self_write = IO.pipe
   end
 end
 
-sleep 30
+sleep 10
 Process.kill 'TERM', $$
 
 while (readable_io = IO.select([self_read]))
