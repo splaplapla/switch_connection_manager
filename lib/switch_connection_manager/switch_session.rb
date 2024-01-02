@@ -167,7 +167,7 @@ class SwitchConnectionManager::SwitchSession
     @procon_simulator_thread =
       Thread.start do
         loop do
-          break if switch_session.terminated?
+          break if terminated?
 
           any_input_response
           sleep(0.03)
