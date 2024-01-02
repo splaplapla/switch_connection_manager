@@ -31,16 +31,15 @@ Thread.new do
 end
 
 
-sleep 1
-Process.kill 'TERM', $$
-
-
 self_read, self_write = IO.pipe
 %w[TERM INT QUIT].each do |sig|
   trap sig do
     self_write.puts(sig)
   end
 end
+
+sleep 30
+Process.kill 'TERM', $$
 
 while (readable_io = IO.select([self_read]))
   signal = readable_io.first[0].gets.strip
