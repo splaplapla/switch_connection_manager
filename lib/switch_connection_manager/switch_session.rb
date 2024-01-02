@@ -110,9 +110,7 @@ class SwitchConnectionManager::SwitchSession
   def non_blocking_read
     data = gadget.read_nonblock(64)
     log(">>> #{data.unpack("H*").first}")
-    return data
-  rescue IO::EAGAINWaitReadable
-    retry
+    data
   end
 
   def non_blocking_read_with_timeout
