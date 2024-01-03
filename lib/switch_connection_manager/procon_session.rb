@@ -7,11 +7,7 @@ class SwitchConnectionManager::ProconSession
 
   def initialize
     @procon_connection_status = SwitchConnectionManager::ProconConnectionStatus.new
-    @configuration_steps = []
-    @prebypass_connection_status = SwitchConnectionManager::ProconInternalStatus.new
-    SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
-      @configuration_steps << step
-    end
+    @prebypass_connection_status, @configuration_steps = SwitchConnectionManager::ProconInternalStatus.build
   end
 
   # @return [void]

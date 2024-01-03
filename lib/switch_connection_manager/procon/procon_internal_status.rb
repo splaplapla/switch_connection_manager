@@ -122,6 +122,16 @@ class SwitchConnectionManager::ProconInternalStatus
     @sub_command_received_status = CommandReceivedStatus.new
   end
 
+  def build
+    configuration_steps = []
+    prebypass_connection_status = SwitchConnectionManager::ProconInternalStatus.new
+    SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
+      configuration_steps << step
+    end
+
+    [prebypass_connection_status, configuration_steps]
+  end
+
   def mark_as_send(step: )
     unless SUB_COMMANDS_NAME_TABLE[step]
       # FIXME: これなおす
