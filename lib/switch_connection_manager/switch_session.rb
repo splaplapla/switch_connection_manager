@@ -48,11 +48,11 @@ class SwitchConnectionManager::SwitchSession
       when "0000", "8005"
         return nil
       when "8001"
-        responseo_to_switch(
+        response_to_switch(
           make_response("81", "01", "0003#{@mac_addr}")
         )
       when "8002"
-        responseo_to_switch("8102")
+        response_to_switch("8102")
       when "8004"
         @finish_prepare = true
         return
@@ -134,7 +134,7 @@ class SwitchConnectionManager::SwitchSession
 
   def uart_response(code, subcmd, data)
     buf = [uart_initial_input, code, subcmd, data].join
-    responseo_to_switch(
+    response_to_switch(
       make_response("21", response_counter, buf)
     )
   end
@@ -145,7 +145,7 @@ class SwitchConnectionManager::SwitchSession
     buf.ljust(128, "0")
   end
 
-  def responseo_to_switch(data)
+  def response_to_switch(data)
     write(data)
     data
   end
@@ -200,7 +200,7 @@ class SwitchConnectionManager::SwitchSession
      # raw_data = make_response("30", response_counter,  "81008000889870187771016afdf3ffe70fce3a02823b3f70fdf6ffea0f29f0bf021edf71fdf8ffee0fed37b8e8a214000000000000000000000000000000")
      raw_data = make_response("30", response_counter,  "81008000889870187287509550274ff131029001b0022005a0271ff191028001e00210064027cff141028002000210000000000000000000000000000000")
     # raw_data = make_response("30", response_counter, "81008000078c77448287509550274ff131029001b0022005a0271ff191028001e00210064027cff141028002000210000000000000000000000000000000")
-    responseo_to_switch(raw_data)
+    response_to_switch(raw_data)
   end
 
   def uart_initial_input
