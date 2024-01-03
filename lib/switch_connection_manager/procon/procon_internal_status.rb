@@ -122,7 +122,7 @@ class SwitchConnectionManager::ProconInternalStatus
     @sub_command_received_status = CommandReceivedStatus.new
   end
 
-  def build
+  def self.build
     configuration_steps = []
     prebypass_connection_status = SwitchConnectionManager::ProconInternalStatus.new
     SwitchConnectionManager::ProconInternalStatus::SUB_COMMANDS_ON_START.each do |step|
